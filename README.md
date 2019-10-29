@@ -1,7 +1,7 @@
 # LaunchJava
 
 Yet another Java launcher for Windows. Unique features are:
-* Starts an application from a JLink generated installation.
+* Starts an application from a JLink-generated installation.
 * Works with Java 10+.
 * Is small and so simple, that it can be easily adapted to special needs.
 
