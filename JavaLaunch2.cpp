@@ -1,77 +1,140 @@
-// JavaLaunch2.cpp : Diese Datei enthält die Funktion "main". Hier beginnt und endet die Ausführung des Programms.
-//
+/*
+ * Simplest Java Launcher.
+ *
+ * Copyright (c) 2019 Michael G. Binz
+ *
+ * LGPL
+ */
+
+#include <array>
+
+#include <tchar.h>
+#define WIN32_LEAN_AND_MEAN
+#include <windows.h>
 
 #include <jni.h>
 #include <iostream>
 #include <string>
 
+// Get our resource definitions.
+#include "resource.h"
 
-using namespace std;
 
-static char opt0[] =
-"--add-modules=app.mmt";
-//"-m app.mmt/de.michab.app.mmt.Mmt";
+#define MAX_LOADSTRING 100
 
-static char opt1[] =
-"app.mmt/de.michab.app.mmt.Mmt";
+WCHAR szModuleName[MAX_LOADSTRING];
+WCHAR szMainClass[MAX_LOADSTRING];
 
 static JavaVMOption jvmopt[2];
-
 static JavaVMInitArgs vmArgs;
 
-int main() 
+static int dieWithMessage( const TCHAR* msg )
 {
-    jvmopt[0].optionString = opt0;
-    jvmopt[1].optionString = opt1;
+    TCHAR szExeFileName[MAX_PATH];
+    GetModuleFileName(NULL, szExeFileName, MAX_PATH);
 
-    vmArgs.version = JNI_VERSION_1_8;
+    MessageBox(NULL, msg, szExeFileName, MB_OK | MB_APPLMODAL);
+
+    return 1;
+}
+
+static std::string getStringResource( HINSTANCE instance, UINT id )
+{
+    WCHAR buffer[MAX_LOADSTRING]{};
+
+    int rc = LoadStringW(
+        instance, id, buffer, MAX_LOADSTRING);
+
+    if (rc == 0)
+        return std::string{};
+
+    // Convert to ASCII.
+    std::wstring wresult{ 
+        buffer };
+    std::string result{
+        wresult.begin(),
+        wresult.end() };
+
+    return result;
+}
+
+
+/*
+ * Windows entry point.
+ */
+int APIENTRY wWinMain(
+    _In_ HINSTANCE hInstance,
+    _In_opt_ HINSTANCE hPrevInstance,
+    _In_ LPWSTR    lpCmdLine,
+    _In_ int       nCmdShow)
+{
+    UNREFERENCED_PARAMETER(hPrevInstance);
+    UNREFERENCED_PARAMETER(lpCmdLine);
+
+    std::string mainModule = getStringResource(
+        hInstance, 
+        IDS_JAVA_MAIN_MODULE );
+
+    if ( mainModule.length() == 0 )
+        return dieWithMessage(_T("IDS_JAVA_MAIN_MODULE not in resources."));
+    mainModule = 
+        "--add-modules=" + 
+        mainModule;
+
+    std::string mainClass = getStringResource(
+        hInstance,
+        IDS_JAVA_MAIN_CLASS);
+    if (mainClass.length() == 0)
+        return dieWithMessage(_T("IDS_JAVA_MAIN_CLASS not in resources."));
+
+    jvmopt[0].optionString = 
+        (char *)mainModule.c_str();
+
+    vmArgs.version = JNI_VERSION_10;
     vmArgs.nOptions = 1;
     vmArgs.options = jvmopt;
     vmArgs.ignoreUnrecognized = JNI_TRUE;
 
-    // Create the JVM
+    // Create the JVM.
     JavaVM* javaVM = nullptr;
     JNIEnv* env = nullptr;
-    long flag = JNI_CreateJavaVM(&javaVM, (void**)
-        & env, &vmArgs);
-    if (flag == JNI_ERR) {
-        cout << "Error creating VM. Exiting...\n";
-        return 1;
+    long rc = JNI_CreateJavaVM(
+        &javaVM,
+        (void**)&env, 
+        &vmArgs );
+    if (rc == JNI_ERR) {        
+        return dieWithMessage( _T("Error creating VM\n. Exiting ...") );
     }
 
-    jint v = env->GetVersion();
-
-    std::cout << v << std::endl;
-
-    jclass jcls = env->FindClass("java/lang/System");
-    if (jcls == NULL) {
-        env->ExceptionDescribe();
-        javaVM->DestroyJavaVM();
-        return 1;
-    }
-    if (jcls != NULL) {
-        jmethodID methodId = env->GetStaticMethodID(
-            jcls,
-            "getProperty",
-            "(Ljava/lang/String;)Ljava/lang/String;");
-        if (methodId != NULL) {
-            jstring str = env->NewStringUTF("java.home");
-            jstring got = (jstring) env->CallStaticObjectMethod(jcls, methodId, str);
-            if (env->ExceptionCheck()) {
-                env->ExceptionDescribe();
-                env->ExceptionClear();
-            }
-            // Now convert the Java String to C++ char array 
-            const char* cstr = env->GetStringUTFChars(got, 0);
-            std::cout << cstr << std::endl;
-            env->ReleaseStringUTFChars(got, cstr);
-            env->DeleteLocalRef(got);        
-        }
-    }
+    // TODO(michab) Decide if we keep this.
+    // Reads a system property.
+    //jclass jcls = env->FindClass("java/lang/System");
+    //if (jcls == NULL) {
+    //    env->ExceptionDescribe();
+    //    javaVM->DestroyJavaVM();
+    //    return 1;
+    //}
+    //if (jcls != NULL) {
+    //    jmethodID methodId = env->GetStaticMethodID(
+    //        jcls,
+    //        "getProperty",
+    //        "(Ljava/lang/String;)Ljava/lang/String;");
+    //    if (methodId != NULL) {
+    //        jstring str = env->NewStringUTF("java.home");
+    //        jstring got = (jstring) env->CallStaticObjectMethod(jcls, methodId, str);
+    //        if (env->ExceptionCheck()) {
+    //            env->ExceptionDescribe();
+    //            env->ExceptionClear();
+    //        }
+    //        const char* cstr = env->GetStringUTFChars(got, 0);
+    //        std::cout << cstr << std::endl;
+    //        env->ReleaseStringUTFChars(got, cstr);
+    //        env->DeleteLocalRef(got);        
+    //    }
+    //}
 
     jclass stringClass = 
         env->FindClass("java/lang/String");
-
     jclass jcl2s = env->FindClass("de/michab/app/mmt/Mmt");
     if (jcl2s) {
         jmethodID methodId = env->GetStaticMethodID(
@@ -81,7 +144,7 @@ int main()
         if (methodId != NULL) {
             jobjectArray str = env->NewObjectArray(0,stringClass,0);
 
-            env->CallStaticObjectMethod(jcls, methodId, str);
+            env->CallStaticObjectMethod(jcl2s, methodId, str);
             if (env->ExceptionCheck()) {
                 env->ExceptionDescribe();
                 env->ExceptionClear();
