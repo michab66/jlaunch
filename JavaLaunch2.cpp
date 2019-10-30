@@ -40,20 +40,40 @@ static int dieWithMessage( const TCHAR* msg )
 
 static std::string getStringResource( HINSTANCE instance, UINT id )
 {
-    WCHAR buffer[MAX_LOADSTRING]{};
+    CHAR buffer[MAX_LOADSTRING]{};
+    WCHAR* buffer2;
 
-    int rc = LoadStringW(
-        instance, id, buffer, MAX_LOADSTRING);
+    // Deliberately use LoadStringA to get a result in
+    // byte wide platform encoding as required by the
+    // JNI invocation API.
+    int rcw = LoadStringW(
+        instance, 
+        id,
+        (WCHAR*)(&buffer2), 
+        0);
 
-    if (rc == 0)
+    rcw++;
+
+    std::string result2(rcw , '\0');
+
+    // Deliberately use LoadStringA to get a result in
+    // byte wide platform encoding as required by the
+    // JNI invocation API.
+    int rca = LoadStringA(
+        instance, 
+        id,
+        &result2[0],
+        result2.size() );
+
+    if (rcw == rca)
         return std::string{};
 
+    DWORD error = 
+        GetLastError();
+
     // Convert to ASCII.
-    std::wstring wresult{ 
+    std::string result{ 
         buffer };
-    std::string result{
-        wresult.begin(),
-        wresult.end() };
 
     return result;
 }
