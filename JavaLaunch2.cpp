@@ -25,7 +25,7 @@
 WCHAR szModuleName[MAX_LOADSTRING];
 WCHAR szMainClass[MAX_LOADSTRING];
 
-static JavaVMOption jvmopt[2];
+static JavaVMOption jvmopt[1];
 static JavaVMInitArgs vmArgs;
 
 static int dieWithMessage( const TCHAR* msg )
@@ -38,46 +38,47 @@ static int dieWithMessage( const TCHAR* msg )
     return 1;
 }
 
+/**
+ * Read a string resource for a resource id.
+ *
+ * @param instance The application's instance handle.
+ * @param id The resource id.
+ * @return The resource string converted to 8bit platform encoding. The 
+ * string is empty if the resource was not found.
+ */
 static std::string getStringResource( HINSTANCE instance, UINT id )
 {
     CHAR buffer[MAX_LOADSTRING]{};
     WCHAR* buffer2;
 
-    // Deliberately use LoadStringA to get a result in
-    // byte wide platform encoding as required by the
-    // JNI invocation API.
+    // Get the size of the configured resource string.
     int rcw = LoadStringW(
         instance, 
         id,
         (WCHAR*)(&buffer2), 
         0);
 
-    rcw++;
+    // Create our result string in the required size.
+    std::string result(rcw , '\0');
 
-    std::string result2(rcw , '\0');
-
-    // Deliberately use LoadStringA to get a result in
-    // byte wide platform encoding as required by the
-    // JNI invocation API.
+    // LoadStringA get the actual result converted into the
+    // 8bit platform encoding.
     int rca = LoadStringA(
         instance, 
         id,
-        &result2[0],
-        result2.size() );
+        &result[0],
+        rcw+1 );
 
     if (rcw == rca)
-        return std::string{};
+        return result;
 
+    // TODO(micbinz) implement the error path.
     DWORD error = 
         GetLastError();
 
-    // Convert to ASCII.
-    std::string result{ 
-        buffer };
-
-    return result;
+    // Return the empty string in case of an error.
+    return std::string{};
 }
-
 
 /*
  * Windows entry point.
@@ -97,14 +98,15 @@ int APIENTRY wWinMain(
 
     if ( mainModule.length() == 0 )
         return dieWithMessage(_T("IDS_JAVA_MAIN_MODULE not in resources."));
+    // Add the reqired option prefix to set the main module.
     mainModule = 
         "--add-modules=" + 
         mainModule;
 
-    std::string mainClass = getStringResource(
+    std::string mainClassName = getStringResource(
         hInstance,
         IDS_JAVA_MAIN_CLASS);
-    if (mainClass.length() == 0)
+    if (mainClassName.length() == 0)
         return dieWithMessage(_T("IDS_JAVA_MAIN_CLASS not in resources."));
 
     jvmopt[0].optionString = 
@@ -155,16 +157,17 @@ int APIENTRY wWinMain(
 
     jclass stringClass = 
         env->FindClass("java/lang/String");
-    jclass jcl2s = env->FindClass("de/michab/app/mmt/Mmt");
-    if (jcl2s) {
+    jclass mainClass = 
+        env->FindClass(mainClassName.c_str());
+    if (mainClass) {
         jmethodID methodId = env->GetStaticMethodID(
-            jcl2s,
+            mainClass,
             "main",
             "([Ljava/lang/String;)V");
         if (methodId != NULL) {
             jobjectArray str = env->NewObjectArray(0,stringClass,0);
 
-            env->CallStaticObjectMethod(jcl2s, methodId, str);
+            env->CallStaticObjectMethod(mainClass, methodId, str);
             if (env->ExceptionCheck()) {
                 env->ExceptionDescribe();
                 env->ExceptionClear();
@@ -172,6 +175,8 @@ int APIENTRY wWinMain(
         }
     }
 
+    // Waits until the VM terminates.
     javaVM->DestroyJavaVM();
+
     return 0;
 }
