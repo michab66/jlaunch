@@ -48,24 +48,26 @@ static int dieWithMessage( const TCHAR* msg )
  */
 static std::string getStringResource( HINSTANCE instance, UINT id )
 {
-    CHAR buffer[MAX_LOADSTRING]{};
-    WCHAR* buffer2;
+    WCHAR* notUsed;
 
     // Get the size of the configured resource string.
     int rcw = LoadStringW(
         instance, 
         id,
-        (WCHAR*)(&buffer2), 
+        // We do not use this since it points to the wide character
+        // version of the resource.
+        (WCHAR*)(&notUsed), 
         0);
 
     // Create our result string in the required size.
     std::string result(rcw , '\0');
 
-    // LoadStringA get the actual result converted into the
+    // LoadStringA gets the actual result converted into the
     // 8bit platform encoding.
     int rca = LoadStringA(
         instance, 
         id,
+        // We directly write into the result string.
         &result[0],
         rcw+1 );
 
