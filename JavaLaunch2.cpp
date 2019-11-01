@@ -19,12 +19,6 @@
 // Get our resource definitions.
 #include "resource.h"
 
-
-#define MAX_LOADSTRING 100
-
-WCHAR szModuleName[MAX_LOADSTRING];
-WCHAR szMainClass[MAX_LOADSTRING];
-
 static JavaVMOption jvmopt[1];
 static JavaVMInitArgs vmArgs;
 
@@ -98,7 +92,7 @@ int APIENTRY wWinMain(
         hInstance, 
         IDS_JAVA_MAIN_MODULE );
 
-    if ( mainModule.length() == 0 )
+    if ( mainModule.empty() )
         return dieWithMessage(_T("IDS_JAVA_MAIN_MODULE not in resources."));
     // Add the reqired option prefix to set the main module.
     mainModule = 
@@ -108,11 +102,11 @@ int APIENTRY wWinMain(
     std::string mainClassName = getStringResource(
         hInstance,
         IDS_JAVA_MAIN_CLASS);
-    if (mainClassName.length() == 0)
+    if ( mainClassName.empty() )
         return dieWithMessage(_T("IDS_JAVA_MAIN_CLASS not in resources."));
 
     jvmopt[0].optionString = 
-        (char *)mainModule.c_str();
+        const_cast<char *>(mainModule.c_str());
 
     vmArgs.version = JNI_VERSION_10;
     vmArgs.nOptions = 1;
@@ -161,20 +155,22 @@ int APIENTRY wWinMain(
         env->FindClass("java/lang/String");
     jclass mainClass = 
         env->FindClass(mainClassName.c_str());
-    if (mainClass) {
-        jmethodID methodId = env->GetStaticMethodID(
-            mainClass,
-            "main",
-            "([Ljava/lang/String;)V");
-        if (methodId != NULL) {
-            jobjectArray str = env->NewObjectArray(0,stringClass,0);
+    if ( ! mainClass )
+        return dieWithMessage(_T("IDS_JAVA_MAIN_CLASS not found."));
 
-            env->CallStaticObjectMethod(mainClass, methodId, str);
-            if (env->ExceptionCheck()) {
-                env->ExceptionDescribe();
-                env->ExceptionClear();
-            }
-        }
+    jmethodID mainMethod = env->GetStaticMethodID(
+        mainClass,
+        "main",
+        "([Ljava/lang/String;)V");
+    if ( ! mainMethod )
+        return dieWithMessage(_T("No main() found."));
+
+    jobjectArray str = env->NewObjectArray(0,stringClass,0);
+
+    env->CallStaticObjectMethod(mainClass, mainMethod, str);
+    if (env->ExceptionCheck()) {
+        env->ExceptionDescribe();
+        env->ExceptionClear();
     }
 
     // Waits until the VM terminates.
