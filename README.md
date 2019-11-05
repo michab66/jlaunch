@@ -29,7 +29,7 @@ Next step in the journey is to create an installer now that you have a complete 
 
 # Project config
 * For debugging, set the location of the jvm.dll to use.
-* For debugging disable stop on 0xc0000005 Illegal access.  The Java VM performs deliberate null pointer accesses on startup.
+* For debugging [disable stop on 0xc0000005 Illegal access](https://stackoverflow.com/questions/36250235/exception-0xc0000005-from-jni-createjavavm-jvm-dll).  The Java VM performs deliberate null pointer accesses on startup.
 * Link against the jvm.lib that comes with your Jdk.
 * Add the include directory and the include/win32 directory of your Jdk installation to the include path of the Visual Studio project.
 
