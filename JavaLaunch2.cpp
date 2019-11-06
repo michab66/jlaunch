@@ -19,9 +19,6 @@
 // Get our resource definitions.
 #include "resource.h"
 
-static JavaVMOption jvmopt[1];
-static JavaVMInitArgs vmArgs;
-
 static int dieWithMessage( const TCHAR* msg )
 {
     TCHAR szExeFileName[MAX_PATH];
@@ -42,7 +39,7 @@ static int dieWithMessage( const TCHAR* msg )
  */
 static std::string getStringResource( HINSTANCE instance, UINT id )
 {
-    WCHAR* notUsed;
+    WCHAR* notUsed{};
 
     // Get the size of the configured resource string.
     int rcw = LoadStringW(
@@ -87,6 +84,7 @@ int APIENTRY wWinMain(
 {
     UNREFERENCED_PARAMETER(hPrevInstance);
     UNREFERENCED_PARAMETER(lpCmdLine);
+    UNREFERENCED_PARAMETER(nCmdShow);
 
     std::string mainModule = getStringResource(
         hInstance, 
@@ -105,13 +103,17 @@ int APIENTRY wWinMain(
     if ( mainClassName.empty() )
         return dieWithMessage(_T("IDS_JAVA_MAIN_CLASS not in resources."));
 
-    jvmopt[0].optionString = 
-        const_cast<char *>(mainModule.c_str());
+    std::array<JavaVMOption,1>jvmopt{ 
+        const_cast<char*>(mainModule.c_str()),
+        nullptr 
+    };
 
-    vmArgs.version = JNI_VERSION_10;
-    vmArgs.nOptions = 1;
-    vmArgs.options = jvmopt;
-    vmArgs.ignoreUnrecognized = JNI_TRUE;
+    JavaVMInitArgs vmArgs{
+        JNI_VERSION_10,
+        static_cast<jint>(jvmopt.size()),
+        jvmopt.data(),
+        JNI_FALSE 
+    };
 
     // Create the JVM.
     JavaVM* javaVM = nullptr;
@@ -165,12 +167,17 @@ int APIENTRY wWinMain(
     if ( ! mainMethod )
         return dieWithMessage(_T("No main() found."));
 
-    jobjectArray str = env->NewObjectArray(0,stringClass,0);
+    jobjectArray argv = 
+        env->NewObjectArray(0,stringClass,0);
 
-    env->CallStaticObjectMethod(mainClass, mainMethod, str);
+    env->CallStaticObjectMethod(
+        mainClass,
+        mainMethod,
+        argv);
     if (env->ExceptionCheck()) {
         env->ExceptionDescribe();
         env->ExceptionClear();
+        return dieWithMessage(_T("No good."));
     }
 
     // Waits until the VM terminates.
