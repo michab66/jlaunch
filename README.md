@@ -30,8 +30,7 @@ Next step in the journey is to create an installer now that you have a complete 
 # Project config
 * For debugging, set the location of the jvm.dll to use.  This is typically the jvm.dll inside your JLink-generated application image.
 * For debugging [disable stop on 0xc0000005 Illegal access](https://stackoverflow.com/questions/36250235/exception-0xc0000005-from-jni-createjavavm-jvm-dll).  The Java VM performs deliberate null pointer accesses on startup.
-* Link against the jvm.lib that comes with your Jdk.
 * Make sure the environment variable `JAVA_HOME` is defined since it is used by the project to refer to includes and libraries.
 
-# Links that were helpful in hacking the tool
+# Links used
 https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/intro.html
