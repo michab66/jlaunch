@@ -75,16 +75,16 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
-    <IncludePath>C:\Program Files\Amazon Corretto\jdk11.0.4_10\include\win32;C:\Program Files\Amazon Corretto\jdk11.0.4_10\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files\Amazon Corretto\jdk11.0.4_10\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(JAVA_HOME)\include\win32;$(JAVA_HOME)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(JAVA_HOME)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <LinkIncremental>false</LinkIncremental>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <LinkIncremental>false</LinkIncremental>
-    <IncludePath>C:\Program Files\Amazon Corretto\jdk11.0.4_10\include\win32;C:\Program Files\Amazon Corretto\jdk11.0.4_10\include;$(IncludePath)</IncludePath>
-    <LibraryPath>C:\Program Files\Amazon Corretto\jdk11.0.4_10\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(JAVA_HOME)\include\win32;$(JAVA_HOME)\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(JAVA_HOME)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
