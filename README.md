@@ -21,7 +21,7 @@ The executable the build generates should be renamed to the name of your applica
 
 Double clicking the launcher starts the application.
 
-Next step in the journey is to create an installer now that you have a complete Windows application.
+Next step in the journey is to create an installer now that you have a complete Windows application. The [WiX toolset](https://wixtoolset.org/) is a good choice.
 
 # Preconditions
 * Requires Microsoft Visual Studio.  Version 19 was used for the implementation.
