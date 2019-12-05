@@ -111,5 +111,8 @@ int wmain( int argc, wchar_t** argv )
 
     micbinz::ResourceMgr resourceMgr( exeName );
 
-    std::cout << "Hello World!\n";
+    BOOL success = 
+        resourceMgr.updateIcon(312, iconName);
+
+    std::cout << "Hello World! " << success << std::endl ;
 }

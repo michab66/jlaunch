@@ -10,14 +10,16 @@ namespace micbinz
 ResourceMgr::ResourceMgr(std::wstring exeFileName) {
     handle_ = BeginUpdateResource(
         exeFileName.c_str(),
-        FALSE);
+        TRUE);
     // TODO error handling exc
     std::cout << "handle is " << handle_ << std::endl;
 }
 
 ResourceMgr::~ResourceMgr() {
     // TODO error handling exc
-    EndUpdateResource(handle_, FALSE);
+    BOOL success = EndUpdateResource(handle_, FALSE);
+
+    std::cout << "dtor " << success << std::endl;
 
     handle_ = nullptr;
 }
@@ -58,6 +60,8 @@ BOOL ResourceMgr::updateIcon(int resourceId, std::wstring iconPathName) {
     std::stringstream out;
     out << is.rdbuf();
     std::string iconBuffer = out.str();
+
+    std::cout << "Lnegth is " << iconBuffer.length() << std::endl;
 
     return UpdateResource(
         handle_,
