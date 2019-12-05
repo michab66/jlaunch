@@ -152,6 +152,10 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="jlgen.cpp" />
+    <ClCompile Include="ResourceMgr.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="ResourceMgr.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

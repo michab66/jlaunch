@@ -2,9 +2,9 @@
 // Von Microsoft Visual C++ generierte Includedatei.
 // Verwendet durch Resource.rc
 //
-#define IDS_JAVA_MAIN_MODULE            101
-#define IDS_JAVA_MAIN_CLASS             102
-#define IDI_ICON1                       102
+#define IDI_ICON1                       312
+#define IDS_JAVA_MAIN_MODULE            313
+#define IDS_JAVA_MAIN_CLASS             314
 
 // Next default values for new objects
 // 

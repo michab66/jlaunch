@@ -7,6 +7,8 @@
 #include <string>
 #include <iostream>
 
+#include "ResourceMgr.h"
+
 static void ErrorHandler( std::wstring msg )
 {
     std::wcerr << msg << std::endl;
@@ -96,8 +98,18 @@ static void generate()
     }
 }
 
-int main()
+int wmain( int argc, wchar_t** argv )
 {
-    std::cout << "Hello World!\n";
+    if (argc != 3)
+    {
+        std::cout << "Not three" << std::endl;
+        return 1;
+    }
 
+    std::wstring exeName{ argv[1] };
+    std::wstring iconName{ argv[2] };
+
+    micbinz::ResourceMgr resourceMgr( exeName );
+
+    std::cout << "Hello World!\n";
 }
