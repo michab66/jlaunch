@@ -36,3 +36,5 @@ Next step in the journey is to create an installer now that you have a complete 
 * https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/intro.html
 * [Dynamic resource replacement on Windows](https://docs.microsoft.com/en-us/windows/win32/menurc/adding-deleting-and-replacing-resources)
 * https://docs.microsoft.com/en-us/windows/win32/api/winuser/nf-winuser-loadimagea
+* https://social.msdn.microsoft.com/Forums/vstudio/en-US/8da318b3-1c14-4225-859c-138f9b9c749f/resource-injection?forum=winforms
+
