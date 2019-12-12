@@ -16,6 +16,8 @@
 #include <fstream>
 #include <sstream>
 
+#include "Image.h"
+
 namespace micbinz {
     // https://github.com/BillyONeal/Instalog/blob/master/LogCommon/Win32Exception.hpp
 
@@ -37,6 +39,7 @@ namespace micbinz {
         /**
          * Update an icon resource.
          */
+        BOOL updateIcon(int resourceId, micbinz::Image iconPathName);
         BOOL updateIcon(int resourceId, std::wstring iconPathName);
     };
 } // micbinz

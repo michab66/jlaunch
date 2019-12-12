@@ -163,7 +163,7 @@
     <ClInclude Include="resource.h" />
   </ItemGroup>
   <ItemGroup>
-    <Image Include="MMT.ico" />
+    <Image Include="..\favicon.ico" />
   </ItemGroup>
   <ItemGroup>
     <ResourceCompile Include="Resource.rc" />

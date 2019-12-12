@@ -25,7 +25,7 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="MMT.ico">
+    <Image Include="..\favicon.ico">
       <Filter>Ressourcendateien</Filter>
     </Image>
   </ItemGroup>

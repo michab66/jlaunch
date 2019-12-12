@@ -21,9 +21,15 @@
     <ClCompile Include="ResourceMgr.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="Image.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ResourceMgr.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="Image.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

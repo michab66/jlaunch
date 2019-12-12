@@ -34,42 +34,49 @@ BOOL ResourceMgr::updateString(int resourceId, std::wstring value) {
         MAKEINTRESOURCE(resourceId),
         MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),
         (LPVOID*)value.c_str(),
-        value.length());
+        (DWORD)value.length());
     // TODO error handling exc
+}
+
+std::string get_file_string2( std::wstring name ) {
+    std::ifstream       file(name);
+    /*
+        * Get the size of the file
+        */
+    file.seekg(0, std::ios::end);
+    std::streampos          length = file.tellg();
+    file.seekg(0, std::ios::beg);
+    std::string       buffer(length, 0);
+    file.read(&buffer[0], length);
+
+    return buffer;
 }
 
 /**
  * Update an icon resource.
  */
 BOOL ResourceMgr::updateIcon(int resourceId, std::wstring iconPathName) {
-    // Read the icon into a buffer.
-    std::ifstream is;
-    try
-    {
-        // Set to throw on failure
-        is.exceptions(std::fstream::failbit | std::fstream::badbit);
-        is.open(iconPathName);
-    }
-    catch (std::system_error & error)
-    {
-        //TODO check message of system error.
-        std::cerr << "Failed to open '" << iconPathName.c_str() << "'\n" << error.code().message() << std::endl;
-        return false;
-    }
+    
+    std::string iconBuffer =
+        get_file_string2(iconPathName);
 
-    std::stringstream out;
-    out << is.rdbuf();
-    std::string iconBuffer = out.str();
-
-    std::cout << "Lnegth is " << iconBuffer.length() << std::endl;
+    std::cout << "Length is " << iconBuffer.length() << std::endl;
 
     return UpdateResource(
         handle_,
         RT_ICON,
         MAKEINTRESOURCE(resourceId),
         MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),
-        (LPVOID*)iconBuffer.c_str(),
-        iconBuffer.length());
+        (LPVOID*)iconBuffer.c_str()+22,
+        (DWORD)iconBuffer.length()-22);
     // TODO error handling exc
 }
+
+/**
+ * Update an icon resource.
+ */
+BOOL ResourceMgr::updateIcon(int resourceId, micbinz::Image icon) {
+    return 1;
+}
+
 } // micbinz
