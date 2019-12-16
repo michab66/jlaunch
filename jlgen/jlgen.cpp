@@ -30,6 +30,7 @@ static void ErrorHandler( const char* msg )
     exit(1);
 }
 
+// See https://devblogs.microsoft.com/oldnewthing/20120720-00/?p=7083
 //icon file dir entry
 typedef struct
 {
@@ -239,5 +240,5 @@ int wmain( int argc, wchar_t** argv )
     //BOOL success = 
     //    resourceMgr.updateIcon(312, iconName);
 //    std::cout << "Hello World! " << success << std::endl ;
-    UpdateIcon(iconName.c_str(), 1, 312, exeName.c_str());
+    UpdateIcon(iconName.c_str(), 0, 312, exeName.c_str());
 }
