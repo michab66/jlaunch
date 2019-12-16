@@ -36,3 +36,4 @@ Next step in the journey is to create an installer now that you have a complete 
 * https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/intro.html
 * [Dynamic resource replacement on Windows](https://docs.microsoft.com/en-us/windows/win32/menurc/adding-deleting-and-replacing-resources)
 * https://devblogs.microsoft.com/oldnewthing/?p=12473
+* https://devblogs.microsoft.com/oldnewthing/20120720-00/?p=7083
