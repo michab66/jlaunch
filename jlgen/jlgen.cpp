@@ -167,7 +167,7 @@ static void UpdateIcon(LPCTSTR iconFile, unsigned int iconIndex, unsigned int re
             // Get the identifier of the icon that is most appropriate
             // for the video display.                  
             nID = LookupIconIdFromDirectoryEx((PBYTE)lpResLock, TRUE,
-                32, 32, LR_DEFAULTCOLOR);
+                16, 16, LR_DEFAULTCOLOR);
 
             // Find the bits for the nID icon.               
             hResource = FindResource(hExe,
@@ -220,6 +220,88 @@ static void UpdateIcon(LPCTSTR iconFile, unsigned int iconIndex, unsigned int re
     free(pIconDir);
 }
 
+#if 1
+static void updateResource_1( LPCTSTR iconExe, unsigned int resId, LPCTSTR targetExe )
+{
+    HGLOBAL hResLoad;   // handle to loaded resource
+    HMODULE hExe;       // handle to existing .EXE file
+    HRSRC hRes;         // handle/ptr. to res. info. in hExe
+    HANDLE hUpdateRes;  // update resource handle
+    LPVOID lpResLock;   // pointer to resource data
+    BOOL result;
+    #define IDD_HAND_ABOUTBOX   103
+    #define IDD_FOOT_ABOUTBOX   110
+
+    // Load the .EXE file that contains the dialog box you want to copy.
+    hExe = LoadLibrary( iconExe );
+    if (hExe == NULL)
+    {
+        ErrorHandler( "Could not load exe." );
+        return;
+    }
+
+    // Locate the dialog box resource in the .EXE file.
+    hRes = FindResource(hExe, MAKEINTRESOURCE(102), RT_GROUP_ICON);
+    if (hRes == NULL)
+    {
+        ErrorHandler( "Could not locate icons." );
+        return;
+    }
+
+    // Load the dialog box into global memory.
+    hResLoad = LoadResource(hExe, hRes);
+    if (hResLoad == NULL)
+    {
+        ErrorHandler( "Could not load dialog box." );
+        return;
+    }
+
+    // Lock the dialog box into global memory.
+    lpResLock = LockResource(hResLoad);
+    if (lpResLock == NULL)
+    {
+        ErrorHandler( "Could not lock dialog box." );
+        return;
+    }
+
+    // Open the file to which you want to add the dialog box resource.
+    hUpdateRes = BeginUpdateResource(targetExe, FALSE);
+    if (hUpdateRes == NULL)
+    {
+        ErrorHandler( "Could not open file for writing." );
+        return;
+    }
+
+    // Add the dialog box resource to the update list.
+    result = UpdateResource(hUpdateRes,    // update resource handle
+        RT_GROUP_ICON,                         // change dialog box resource
+        MAKEINTRESOURCE(resId),         // dialog box id
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),  // neutral language
+        lpResLock,                         // ptr to resource info
+        SizeofResource(hExe, hRes));       // size of resource info
+
+    if (result == FALSE)
+    {
+        ErrorHandler( "Could not add resource." );
+        return;
+    }
+
+    // Write changes to FOOT.EXE and then close it.
+    if (!EndUpdateResource(hUpdateRes, FALSE))
+    {
+        ErrorHandler( "Could not write changes to file." );
+        return;
+    }
+
+    // Clean up.
+    if (!FreeLibrary(hExe))
+    {
+        ErrorHandler( "Could not free executable." );
+        return;
+    }
+}
+#endif
+
 int wmain( int argc, wchar_t** argv )
 {
     if (argc != 3)
@@ -240,5 +322,6 @@ int wmain( int argc, wchar_t** argv )
     //BOOL success = 
     //    resourceMgr.updateIcon(312, iconName);
 //    std::cout << "Hello World! " << success << std::endl ;
-    UpdateIcon(iconName.c_str(), 0, 312, exeName.c_str());
+   // UpdateIcon(iconName.c_str(), 0, 312, exeName.c_str());
+    updateResource_1( L"C:\\cygwin64\\tmp\\jlaunch\\x64\\Debug\\JavaLaunch2.exe", 312, exeName.c_str() );
 }
