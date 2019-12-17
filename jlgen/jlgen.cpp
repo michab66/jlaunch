@@ -43,6 +43,18 @@ typedef struct
     DWORD       dwBytesInRes;    // How many bytes in this resource?
     DWORD       dwImageOffset;   // Where in the file is this image?
 } ICONDIRENTRY, * LPICONDIRENTRY;
+static void dump(int idx, LPICONDIRENTRY iconDirEntry)
+{
+    std::cout << "ICONDIRENTRY[" << idx << "] " << 
+        " w=" << (int)iconDirEntry->bWidth <<
+        " h=" << (int)iconDirEntry->bHeight <<
+        " colorCount=" << (int)iconDirEntry->bColorCount <<
+        " byteCount=" << iconDirEntry->dwBytesInRes <<
+        " offset=" << iconDirEntry->dwImageOffset <<
+        std::endl;
+}
+
+#pragma pack(2)
 
 //icon file header
 typedef struct
@@ -52,6 +64,28 @@ typedef struct
     WORD           idCount;      // How many images?
     ICONDIRENTRY   idEntries[1]; // An entry for each image (idCount of 'em)
 } ICONDIR, * LPICONDIR;
+static void dump(LPICONDIR iconDirEntry)
+{
+    if (iconDirEntry->idReserved != 0 || iconDirEntry->idType != 1)
+    {
+        std::cout <<
+            "Not an ICONDIR. idReserved= " <<
+            iconDirEntry->idReserved <<
+            ", idType=" <<
+            iconDirEntry->idType <<
+            std::endl;
+        return;
+    }
+
+    std::cout << 
+        "ICONDIR contains " << 
+        iconDirEntry->idCount <<
+        " icons." << 
+        std::endl;
+
+    for (int i = 0; i < iconDirEntry->idCount; ++i)
+        dump(i, &iconDirEntry->idEntries[i]);
+}
 
 //icon file image
 typedef struct
@@ -104,6 +138,8 @@ static void UpdateIcon(LPCTSTR iconFile, unsigned int iconIndex, unsigned int re
         pIconDir->idCount * sizeof(ICONDIRENTRY),
         &dwBytesRead, 
         NULL);
+
+    dump(pIconDir);
 
     // Loop through and read in each image
     for (int i = 0; i < pIconDir->idCount; i++)
@@ -227,7 +263,7 @@ static void updateResource_1( LPCTSTR iconExe, unsigned int resId, LPCTSTR targe
     HMODULE hExe;       // handle to existing .EXE file
     HRSRC hRes;         // handle/ptr. to res. info. in hExe
     HANDLE hUpdateRes;  // update resource handle
-    LPVOID lpResLock;   // pointer to resource data
+    //LPVOID lpResLock;   // pointer to resource data
     BOOL result;
     #define IDD_HAND_ABOUTBOX   103
     #define IDD_FOOT_ABOUTBOX   110
@@ -257,12 +293,14 @@ static void updateResource_1( LPCTSTR iconExe, unsigned int resId, LPCTSTR targe
     }
 
     // Lock the dialog box into global memory.
-    lpResLock = LockResource(hResLoad);
+    LPICONDIR lpResLock = (LPICONDIR)LockResource(hResLoad);
     if (lpResLock == NULL)
     {
         ErrorHandler( "Could not lock dialog box." );
         return;
     }
+
+    dump(lpResLock);
 
     // Open the file to which you want to add the dialog box resource.
     hUpdateRes = BeginUpdateResource(targetExe, FALSE);
@@ -322,6 +360,6 @@ int wmain( int argc, wchar_t** argv )
     //BOOL success = 
     //    resourceMgr.updateIcon(312, iconName);
 //    std::cout << "Hello World! " << success << std::endl ;
-   // UpdateIcon(iconName.c_str(), 0, 312, exeName.c_str());
-    updateResource_1( L"C:\\cygwin64\\tmp\\jlaunch\\x64\\Debug\\JavaLaunch2.exe", 312, exeName.c_str() );
+    UpdateIcon(iconName.c_str(), 0, 312, exeName.c_str());
+    // updateResource_1( L"C:\\cygwin64\\tmp\\jlaunch\\x64\\Debug\\JavaLaunch2.exe", 312, exeName.c_str() );
 }
