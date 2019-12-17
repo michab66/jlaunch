@@ -279,7 +279,7 @@ static void updateResource_1(LPCTSTR iconExe, unsigned int resId, LPCTSTR target
     }
 
     // Locate the dialog box resource in the .EXE file.
-    hRes = FindResource(hExe, MAKEINTRESOURCE(102), RT_GROUP_ICON);
+    hRes = FindResource(hExe, MAKEINTRESOURCE(312), RT_GROUP_ICON);
     if (hRes == NULL)
     {
         ErrorHandler("Could not locate icons.");
@@ -295,7 +295,7 @@ static void updateResource_1(LPCTSTR iconExe, unsigned int resId, LPCTSTR target
     }
 
     // Lock the dialog box into global memory.
-    LPICONDIR lpResLock = (LPICONDIR)LockResource(hResLoad);
+    PGRPICONDIR lpResLock = (PGRPICONDIR)LockResource(hResLoad);
     if (lpResLock == NULL)
     {
         ErrorHandler("Could not lock dialog box.");
@@ -311,6 +311,10 @@ static void updateResource_1(LPCTSTR iconExe, unsigned int resId, LPCTSTR target
         ErrorHandler("Could not open file for writing.");
         return;
     }
+
+    DWORD sor = 
+        SizeofResource(hExe, hRes);
+    DWORD check = sizeof(GRPICONDIR) + sizeof(GRPICONDIRENTRY);
 
     // Add the dialog box resource to the update list.
     result = UpdateResource(hUpdateRes,    // update resource handle
@@ -342,9 +346,28 @@ static void updateResource_1(LPCTSTR iconExe, unsigned int resId, LPCTSTR target
 }
 #endif
 
-#if 0
+#if 1
+static DWORD sizeofGroup(PGRPICONDIR dir)
+{
+    DWORD result = 
+        sizeof(PGRPICONDIR);
+    result += 
+        (dir->idCount - 1) * 
+        sizeof(PGRPICONDIRENTRY);
+    return result;
+}
+
 static void UpdateIcon_2(LPCTSTR iconFile, unsigned int iconIndex, unsigned int resId, LPCTSTR exeFile)
 {
+    // Open the file to which you want to add the dialog box resource.
+    HANDLE hUpdateRes;  // update resource handle
+    hUpdateRes = BeginUpdateResource(exeFile, FALSE);
+    if (hUpdateRes == NULL)
+    {
+        ErrorHandler("Could not open file for writing.");
+        return;
+    }
+
     // We need an ICONDIR to hold the data
     LPICONDIR pIconDir = (LPICONDIR)malloc(sizeof(ICONDIR));
 
@@ -383,8 +406,33 @@ static void UpdateIcon_2(LPCTSTR iconFile, unsigned int iconIndex, unsigned int 
 
     dump(pIconDir);
 
+    PGRPICONDIR pIconGrp = (PGRPICONDIR)malloc(sizeof(GRPICONDIR) + ((pIconDir->idCount - 1) * sizeof(GRPICONDIRENTRY)));
+    pIconGrp->idReserved = pIconDir->idReserved;
+    pIconGrp->idCount = pIconDir->idCount;
+    pIconGrp->idType = pIconDir->idType;
+
+    for (int i = 0; i < pIconGrp->idCount; ++i)
+    {
+        (pIconGrp->idEntries[i]).bWidth = (pIconDir->idEntries[i]).bWidth;
+        (pIconGrp->idEntries[i]).bHeight = (pIconDir->idEntries[i]).bHeight;
+        (pIconGrp->idEntries[i]).bColorCount = (pIconDir->idEntries[i]).bColorCount;
+        (pIconGrp->idEntries[i]).bReserved = (pIconDir->idEntries[i]).bReserved;
+        (pIconGrp->idEntries[i]).wPlanes = (pIconDir->idEntries[i]).wPlanes;
+        (pIconGrp->idEntries[i]).wBitCount = (pIconDir->idEntries[i]).wBitCount;
+        (pIconGrp->idEntries[i]).dwBytesInRes = (pIconDir->idEntries[i]).dwBytesInRes;
+        (pIconGrp->idEntries[i]).nId = i+1;
+    }
+
+    // Write the group entry.
+    BOOL result = UpdateResource(hUpdateRes,    // update resource handle
+        RT_GROUP_ICON,                         // change dialog box resource
+        MAKEINTRESOURCE(resId),         // dialog box id
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),  // neutral language
+        pIconGrp,                         // ptr to resource info
+        sizeofGroup(pIconGrp) );       // size of resource info
+
     // Loop through and read in each image
-    for (int i = 0; i < pIconDir->idCount; i++)
+    for (DWORD i = 0; i < pIconDir->idCount; i++)
     {
         // Allocate memory to hold the image
         LPVOID pIconImage = malloc(pIconDir->idEntries[i].dwBytesInRes);
@@ -396,34 +444,18 @@ static void UpdateIcon_2(LPCTSTR iconFile, unsigned int iconIndex, unsigned int 
             &dwBytesRead, NULL);
         // Here, pIconImage is an ICONIMAGE structure.
         //update resource in exe
-        if (i == iconIndex)
         {
-            HGLOBAL hResLoad;   // handle to loaded resource
-            HMODULE hExe;       // handle to existing .EXE file
-            HRSRC hRes;         // handle/ptr. to res. info. in hExe
-            HANDLE hUpdateRes;  // update resource handle
-            LPVOID lpResLock;   // pointer to resource data
             BOOL result;
-            //LPVOID lpResource;   // pointer to resource data
-            HRSRC hResource;    // handle to FindResource 
-            //HGLOBAL hMem;         // handle to LoadResource
-            int nID;            // ID of resource that best fits current screen
 
-            // Open the file to which you want to add the dialog box resource.
-            hUpdateRes = BeginUpdateResource(exeFile, FALSE);
-            if (hUpdateRes == NULL)
-            {
-                ErrorHandler("Could not open file for writing.");
-                return;
-            }
+            DWORD id = i + 1;
 
             // update the icon.
             result = UpdateResource(hUpdateRes,    // update resource handle
                 RT_ICON,                         // change icon
-                MAKEINTRESOURCE(nID),         // icon id
+                MAKEINTRESOURCE(id),         // icon id
                 MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),  // neutral language
                 pIconImage,                         // ptr to resource info      
-                updateSize);       // size of resource info                
+                pIconDir->idEntries[i].dwBytesInRes );       // size of resource info                
 
             if (result == FALSE)
             {
@@ -431,20 +463,23 @@ static void UpdateIcon_2(LPCTSTR iconFile, unsigned int iconIndex, unsigned int 
                 return;
             }
 
-            // Write changes to FOOT.EXE and then close it.
-            if (!EndUpdateResource(hUpdateRes, FALSE))
-            {
-                ErrorHandler("Could not write changes to file.");
-                return;
-            }
         }
 
         // Then, free the associated memory
         free(pIconImage);
     }
 
+    // Write changes to FOOT.EXE and then close it.
+    if (!EndUpdateResource(hUpdateRes, FALSE))
+    {
+        ErrorHandler("Could not write changes to file.");
+        return;
+    }
+
+
     // Clean up the ICONDIR memory
     free(pIconDir);
+    free(pIconGrp);
 }
 #endif
 
@@ -469,5 +504,6 @@ int wmain( int argc, wchar_t** argv )
     //    resourceMgr.updateIcon(312, iconName);
 //    std::cout << "Hello World! " << success << std::endl ;
     //UpdateIcon(iconName.c_str(), 0, 312, exeName.c_str());
-    updateResource_1( L"C:\\cygwin64\\tmp\\jlaunch\\x64\\Debug\\jlaunch.exe", 312, exeName.c_str() );
+    //updateResource_1(L"C:\\cygwin64\\tmp\\jlaunch\\x64\\Debug\\jlaunchKopie.exe", 312, exeName.c_str());
+    UpdateIcon_2(iconName.c_str(), 0, 312, exeName.c_str());
 }
