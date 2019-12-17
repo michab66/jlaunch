@@ -420,19 +420,13 @@ static void UpdateIcon_2(LPCTSTR iconFile, unsigned int iconIndex, unsigned int 
         (pIconGrp->idEntries[i]).wPlanes = (pIconDir->idEntries[i]).wPlanes;
         (pIconGrp->idEntries[i]).wBitCount = (pIconDir->idEntries[i]).wBitCount;
         (pIconGrp->idEntries[i]).dwBytesInRes = (pIconDir->idEntries[i]).dwBytesInRes;
-        (pIconGrp->idEntries[i]).nId = i+1;
+        (pIconGrp->idEntries[i]).nId = i;
     }
 
-    // Write the group entry.
-    BOOL result = UpdateResource(hUpdateRes,    // update resource handle
-        RT_GROUP_ICON,                         // change dialog box resource
-        MAKEINTRESOURCE(resId),         // dialog box id
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),  // neutral language
-        pIconGrp,                         // ptr to resource info
-        sizeofGroup(pIconGrp) );       // size of resource info
+    dump(pIconGrp);
 
     // Loop through and read in each image
-    for (DWORD i = 0; i < pIconDir->idCount; i++)
+    for (WORD i = 0; i < pIconDir->idCount; i++)
     {
         // Allocate memory to hold the image
         LPVOID pIconImage = malloc(pIconDir->idEntries[i].dwBytesInRes);
@@ -447,12 +441,10 @@ static void UpdateIcon_2(LPCTSTR iconFile, unsigned int iconIndex, unsigned int 
         {
             BOOL result;
 
-            DWORD id = i + 1;
-
             // update the icon.
             result = UpdateResource(hUpdateRes,    // update resource handle
                 RT_ICON,                         // change icon
-                MAKEINTRESOURCE(id),         // icon id
+                MAKEINTRESOURCE(i),         // icon id
                 MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),  // neutral language
                 pIconImage,                         // ptr to resource info      
                 pIconDir->idEntries[i].dwBytesInRes );       // size of resource info                
@@ -468,6 +460,14 @@ static void UpdateIcon_2(LPCTSTR iconFile, unsigned int iconIndex, unsigned int 
         // Then, free the associated memory
         free(pIconImage);
     }
+
+    // Write the group entry.
+    BOOL result = UpdateResource(hUpdateRes,    // update resource handle
+        RT_GROUP_ICON,                         // change dialog box resource
+        MAKEINTRESOURCE(resId),         // dialog box id
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),  // neutral language
+        pIconGrp,                         // ptr to resource info
+        sizeofGroup(pIconGrp));       // size of resource info
 
     // Write changes to FOOT.EXE and then close it.
     if (!EndUpdateResource(hUpdateRes, FALSE))
