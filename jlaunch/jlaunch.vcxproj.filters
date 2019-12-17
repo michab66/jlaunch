@@ -25,14 +25,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <Image Include="..\favicon.ico">
-      <Filter>Ressourcendateien</Filter>
-    </Image>
-    <Image Include="favicon.ico">
-      <Filter>Ressourcendateien</Filter>
-    </Image>
-  </ItemGroup>
-  <ItemGroup>
     <ResourceCompile Include="Resource.rc">
       <Filter>Ressourcendateien</Filter>
     </ResourceCompile>

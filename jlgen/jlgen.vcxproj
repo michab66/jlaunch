@@ -158,6 +158,7 @@
   <ItemGroup>
     <ClInclude Include="Image.h" />
     <ClInclude Include="ResourceMgr.h" />
+    <ClInclude Include="winicon.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
