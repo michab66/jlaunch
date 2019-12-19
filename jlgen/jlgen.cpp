@@ -15,18 +15,6 @@
 
 static void ErrorHandler( const char* msg )
 {
-    //const wchar_t* wCharString = msg.GetString();
-
-    //size_t origsize = wcslen(wCharString) + 1;
-
-    //size_t convertedChars = 0;
-
-    //char* CharString;
-
-    //CharString = new char(origsize);
-
-    //wcstombs_s(&convertedChars, CharString, origsize, wCharString, _TRUNCATE);
-
     printf("%s\n", msg);
     exit(1);
 }
@@ -357,7 +345,10 @@ static DWORD sizeofGroup(PGRPICONDIR dir)
     return result;
 }
 
-static void UpdateIcon_2(LPCTSTR iconFile, unsigned int iconIndex, unsigned int resId, LPCTSTR exeFile)
+static void UpdateIcon_2(
+    LPCTSTR iconFile, 
+    unsigned int resId, 
+    LPCTSTR exeFile)
 {
     // Open the file to which you want to add the dialog box resource.
     HANDLE hUpdateRes;  // update resource handle
@@ -441,8 +432,16 @@ static void UpdateIcon_2(LPCTSTR iconFile, unsigned int iconIndex, unsigned int 
         {
             BOOL result;
 
+            std::cout <<
+                "Adding icon " <<
+                (int)i <<
+                " size is: " <<
+                (int)(pIconDir->idEntries[i].dwBytesInRes) <<
+                std::endl;
+
             // update the icon.
-            result = UpdateResource(hUpdateRes,    // update resource handle
+            result = UpdateResource(
+                hUpdateRes,    // update resource handle
                 RT_ICON,                         // change icon
                 MAKEINTRESOURCE(i),         // icon id
                 MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),  // neutral language
@@ -490,20 +489,30 @@ int wmain( int argc, wchar_t** argv )
         std::cout << "Not three" << std::endl;
         return 1;
     }
+    try
+    {
+        std::wstring exeName{ argv[1] };
+        std::wstring iconName{ argv[2] };
 
-    std::wstring exeName{ argv[1] };
-    std::wstring iconName{ argv[2] };
+        //micbinz::Image icon(iconName);
+        //micbinz::ResourceMgr resourceMgr( exeName );
 
-    //micbinz::Image icon(iconName);
-    //micbinz::ResourceMgr resourceMgr( exeName );
+        //std::wcout << L"Set icon to: " << iconName << std::endl;
+        //std::wcout << L"Target is: " << exeName << std::endl;
 
-    //std::wcout << L"Set icon to: " << iconName << std::endl;
-    //std::wcout << L"Target is: " << exeName << std::endl;
+        //BOOL success = 
+        //    resourceMgr.updateIcon(312, iconName);
+    //    std::cout << "Hello World! " << success << std::endl ;
+        //UpdateIcon(iconName.c_str(), 0, 312, exeName.c_str());
+        updateResource_1(L"C:\\cygwin64\\tmp\\jlaunch\\x64\\Debug\\jlaunchKopie.exe", 312, exeName.c_str());
+        /*UpdateIcon_2(
+            iconName.c_str(),
+            312,
+            exeName.c_str());*/
+    }
+    catch (std::invalid_argument & e) {
+        std::cout << "Error: " << e.what() << std::endl;
 
-    //BOOL success = 
-    //    resourceMgr.updateIcon(312, iconName);
-//    std::cout << "Hello World! " << success << std::endl ;
-    //UpdateIcon(iconName.c_str(), 0, 312, exeName.c_str());
-    //updateResource_1(L"C:\\cygwin64\\tmp\\jlaunch\\x64\\Debug\\jlaunchKopie.exe", 312, exeName.c_str());
-    UpdateIcon_2(iconName.c_str(), 0, 312, exeName.c_str());
+        return EXIT_FAILURE;
+    }
 }

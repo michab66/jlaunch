@@ -24,6 +24,12 @@
     <ClCompile Include="Image.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="..\..\..\..\Users\Michael\svn\rep_daimler\wonderland\dev_cpp_tools\src\util_console_app.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
+    <ClCompile Include="GroupDir.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ResourceMgr.h">
@@ -33,6 +39,12 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="winicon.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\..\Users\Michael\svn\rep_daimler\wonderland\dev_cpp_tools\src\util_console_app.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="GroupDir.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
