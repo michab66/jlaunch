@@ -11,6 +11,7 @@
 #include "winicon.h"
 #include "ResourceMgr.h"
 #include "Image.h"
+#include "GroupDir.h"
 
 
 static void ErrorHandler( const char* msg )
@@ -338,10 +339,10 @@ static void updateResource_1(LPCTSTR iconExe, unsigned int resId, LPCTSTR target
 static DWORD sizeofGroup(PGRPICONDIR dir)
 {
     DWORD result = 
-        sizeof(PGRPICONDIR);
+        sizeof(GRPICONDIR);
     result += 
         (dir->idCount - 1) * 
-        sizeof(PGRPICONDIRENTRY);
+        sizeof(GRPICONDIRENTRY);
     return result;
 }
 
@@ -416,6 +417,14 @@ static void UpdateIcon_2(
 
     dump(pIconGrp);
 
+    // Write the group entry.
+    BOOL result = UpdateResource(hUpdateRes,    // update resource handle
+        RT_GROUP_ICON,                         // change dialog box resource
+        MAKEINTRESOURCE(resId),         // dialog box id
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),  // neutral language
+        pIconGrp,                         // ptr to resource info
+        sizeofGroup(pIconGrp));       // size of resource info
+
     // Loop through and read in each image
     for (WORD i = 0; i < pIconDir->idCount; i++)
     {
@@ -460,14 +469,6 @@ static void UpdateIcon_2(
         free(pIconImage);
     }
 
-    // Write the group entry.
-    BOOL result = UpdateResource(hUpdateRes,    // update resource handle
-        RT_GROUP_ICON,                         // change dialog box resource
-        MAKEINTRESOURCE(resId),         // dialog box id
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),  // neutral language
-        pIconGrp,                         // ptr to resource info
-        sizeofGroup(pIconGrp));       // size of resource info
-
     // Write changes to FOOT.EXE and then close it.
     if (!EndUpdateResource(hUpdateRes, FALSE))
     {
@@ -481,6 +482,104 @@ static void UpdateIcon_2(
     free(pIconGrp);
 }
 #endif
+
+static void UpdateIcon_3(
+    LPCTSTR iconFile,
+    unsigned int resId,
+    LPCTSTR exeFile)
+{
+    // Open the file to which you want to add the dialog box resource.
+    HANDLE hUpdateRes;  // update resource handle
+    hUpdateRes = BeginUpdateResource(exeFile, FALSE);
+    if (hUpdateRes == NULL)
+    {
+        ErrorHandler("Could not open file for writing.");
+        return;
+    }
+
+    // We need an ICONDIR to hold the data
+    LPICONDIR pIconDir = (LPICONDIR)malloc(sizeof(ICONDIR));
+
+    HANDLE hFile = CreateFile(iconFile, GENERIC_READ | GENERIC_WRITE, FILE_SHARE_READ | FILE_SHARE_WRITE, NULL, OPEN_EXISTING, FILE_FLAG_SEQUENTIAL_SCAN, 0);
+
+    if (hFile == INVALID_HANDLE_VALUE)
+    {
+        ErrorHandler("Load file error!");
+        return;
+    }
+
+    DWORD dwBytesRead;
+
+    // Read the Reserved word
+    WORD tmpReserved;
+    ReadFile(hFile, &tmpReserved, sizeof(WORD), &dwBytesRead, NULL);
+    // Read the Type word - make sure it is 1 for icons
+    WORD tmpIdType;
+    ReadFile(hFile, &tmpIdType, sizeof(WORD), &dwBytesRead, NULL);
+    // Read the count - how many images in this file?
+    WORD tmpIdCount;
+    ReadFile(hFile, &tmpIdCount, sizeof(WORD), &dwBytesRead, NULL);
+    // Allocate IconDir so that idEntries has enough room for idCount elements
+    pIconDir = (LPICONDIR)malloc(
+        sizeof(ICONDIR) + ((tmpIdCount - 1) * sizeof(ICONDIRENTRY)));
+    pIconDir->idReserved = 0;
+    pIconDir->idType = tmpIdType;
+    pIconDir->idCount = tmpIdCount;
+    // Read the ICONDIRENTRY elements
+    ReadFile(
+        hFile,
+        pIconDir->idEntries,
+        pIconDir->idCount * sizeof(ICONDIRENTRY),
+        &dwBytesRead,
+        NULL);
+
+    dump(pIconDir);
+
+    PGRPICONDIR pIconGrp = (PGRPICONDIR)malloc(sizeof(GRPICONDIR) + ((pIconDir->idCount - 1) * sizeof(GRPICONDIRENTRY)));
+    pIconGrp->idReserved = pIconDir->idReserved;
+    pIconGrp->idCount = pIconDir->idCount;
+    pIconGrp->idType = pIconDir->idType;
+
+    for (int i = 0; i < pIconGrp->idCount; ++i)
+    {
+        (pIconGrp->idEntries[i]).bWidth = (pIconDir->idEntries[i]).bWidth;
+        (pIconGrp->idEntries[i]).bHeight = (pIconDir->idEntries[i]).bHeight;
+        (pIconGrp->idEntries[i]).bColorCount = (pIconDir->idEntries[i]).bColorCount;
+        (pIconGrp->idEntries[i]).bReserved = (pIconDir->idEntries[i]).bReserved;
+        (pIconGrp->idEntries[i]).wPlanes = (pIconDir->idEntries[i]).wPlanes;
+        (pIconGrp->idEntries[i]).wBitCount = (pIconDir->idEntries[i]).wBitCount;
+        (pIconGrp->idEntries[i]).dwBytesInRes = (pIconDir->idEntries[i]).dwBytesInRes;
+        (pIconGrp->idEntries[i]).nId = i;
+    }
+
+    dump(pIconGrp);
+
+    // Write the group entry.
+    BOOL result = UpdateResource(hUpdateRes,    // update resource handle
+        RT_GROUP_ICON,                         // change dialog box resource
+        MAKEINTRESOURCE(resId),         // dialog box id
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),  // neutral language
+        pIconGrp,                         // ptr to resource info
+        sizeofGroup(pIconGrp));       // size of resource info
+
+    std::cout << "Wrote size: " << sizeofGroup(pIconGrp) << std::endl;
+
+    // Write changes to FOOT.EXE and then close it.
+    if (!EndUpdateResource(hUpdateRes, FALSE))
+    {
+        ErrorHandler("Could not write changes to file.");
+        return;
+    }
+
+
+    // Clean up the ICONDIR memory
+    free(pIconDir);
+    free(pIconGrp);
+
+    GroupDir gd{ exeFile };
+
+    gd.Dump();
+}
 
 int wmain( int argc, wchar_t** argv )
 {
@@ -504,11 +603,15 @@ int wmain( int argc, wchar_t** argv )
         //    resourceMgr.updateIcon(312, iconName);
     //    std::cout << "Hello World! " << success << std::endl ;
         //UpdateIcon(iconName.c_str(), 0, 312, exeName.c_str());
-        updateResource_1(L"C:\\cygwin64\\tmp\\jlaunch\\x64\\Debug\\jlaunchKopie.exe", 312, exeName.c_str());
-        /*UpdateIcon_2(
+    //    updateResource_1(L"C:\\cygwin64\\tmp\\jlaunch\\x64\\Debug\\jlaunchKopie.exe", 312, exeName.c_str());
+        UpdateIcon_2(
             iconName.c_str(),
             312,
-            exeName.c_str());*/
+            exeName.c_str());
+        //UpdateIcon_3(
+        //    iconName.c_str(),
+        //    312,
+        //    exeName.c_str());
     }
     catch (std::invalid_argument & e) {
         std::cout << "Error: " << e.what() << std::endl;

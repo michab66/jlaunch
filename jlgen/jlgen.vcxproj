@@ -151,17 +151,17 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\..\Users\Michael\svn\rep_daimler\wonderland\dev_cpp_tools\src\util_console_app.cpp" />
     <ClCompile Include="GroupDir.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="jlgen.cpp" />
     <ClCompile Include="ResourceMgr.cpp" />
+    <ClCompile Include="util_console_app.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\..\Users\Michael\svn\rep_daimler\wonderland\dev_cpp_tools\src\util_console_app.hpp" />
     <ClInclude Include="GroupDir.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="ResourceMgr.h" />
+    <ClInclude Include="util_console_app.hpp" />
     <ClInclude Include="winicon.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

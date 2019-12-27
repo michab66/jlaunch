@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include "GroupDir.h"
 
-GroupDir::GroupDir(std::wstring iconExe)
+GroupDir::GroupDir(std::wstring executableName)
 {
     HGLOBAL hResLoad;   // handle to loaded resource
     HMODULE hExe;       // handle to existing .EXE file
@@ -12,7 +12,7 @@ GroupDir::GroupDir(std::wstring iconExe)
     BOOL result;
 
     // Load the .EXE file.
-    hExe = LoadLibrary(iconExe.c_str());
+    hExe = LoadLibrary(executableName.c_str());
     if (hExe == NULL)
         throw std::invalid_argument("Could not load exe.");
 
@@ -30,6 +30,11 @@ GroupDir::GroupDir(std::wstring iconExe)
     dir_ = (PGRPICONDIR)LockResource(hResLoad);
     if (dir_ == NULL)
         throw std::invalid_argument("Could not lock dialog box.");
+}
+
+GroupDir::~GroupDir() 
+{
+
 }
 
 void GroupDir::Dump()
