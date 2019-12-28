@@ -412,7 +412,8 @@ static void UpdateIcon_2(
         (pIconGrp->idEntries[i]).wPlanes = (pIconDir->idEntries[i]).wPlanes;
         (pIconGrp->idEntries[i]).wBitCount = (pIconDir->idEntries[i]).wBitCount;
         (pIconGrp->idEntries[i]).dwBytesInRes = (pIconDir->idEntries[i]).dwBytesInRes;
-        (pIconGrp->idEntries[i]).nId = i;
+        // Note that we must not generate zero-based ids.
+        (pIconGrp->idEntries[i]).nId = i+1;
     }
 
     dump(pIconGrp);
@@ -452,7 +453,7 @@ static void UpdateIcon_2(
             result = UpdateResource(
                 hUpdateRes,    // update resource handle
                 RT_ICON,                         // change icon
-                MAKEINTRESOURCE(i),         // icon id
+                MAKEINTRESOURCE(pIconGrp->idEntries[i].nId),         // icon id
                 MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),  // neutral language
                 pIconImage,                         // ptr to resource info      
                 pIconDir->idEntries[i].dwBytesInRes );       // size of resource info                
