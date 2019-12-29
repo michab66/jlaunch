@@ -1,7 +1,7 @@
 /*
  * $Id$
  *
- * Copyright 2019 Michael Binz
+ * Copyright (c) 2019 Michael Binz
  */
 
 #define WIN32_LEAN_AND_MEAN
@@ -578,7 +578,7 @@ static void UpdateIcon_3(
     free(pIconDir);
     free(pIconGrp);
 
-    micbinz::windows::RtGroupDir gd{ exeFile };
+    mob::windows::RtGroupDir gd{ exeFile };
 
     gd.Dump();
 }

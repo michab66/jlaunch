@@ -3,7 +3,7 @@
 #include <stdexcept>
 #include "RtGroupDir.h"
 
-namespace micbinz
+namespace mob
 {
 namespace windows
 {

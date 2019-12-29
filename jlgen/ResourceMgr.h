@@ -18,7 +18,7 @@
 
 #include "Image.h"
 
-namespace micbinz {
+namespace mob {
     // https://github.com/BillyONeal/Instalog/blob/master/LogCommon/Win32Exception.hpp
 
     class ResourceMgr
@@ -39,7 +39,7 @@ namespace micbinz {
         /**
          * Update an icon resource.
          */
-        BOOL updateIcon(int resourceId, micbinz::Image iconPathName);
+        BOOL updateIcon(int resourceId, mob::Image iconPathName);
         BOOL updateIcon(int resourceId, std::wstring iconPathName);
     };
 } // micbinz

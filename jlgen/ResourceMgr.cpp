@@ -4,7 +4,7 @@
 
 #include "ResourceMgr.h"
 
-namespace micbinz
+namespace mob
 {
 
 ResourceMgr::ResourceMgr(std::wstring exeFileName) {
@@ -75,7 +75,7 @@ BOOL ResourceMgr::updateIcon(int resourceId, std::wstring iconPathName) {
 /**
  * Update an icon resource.
  */
-BOOL ResourceMgr::updateIcon(int resourceId, micbinz::Image icon) {
+BOOL ResourceMgr::updateIcon(int resourceId, mob::Image icon) {
     return 1;
 }
 

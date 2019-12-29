@@ -8,7 +8,7 @@
 #include <fstream>
 #include <sstream>
 
-namespace micbinz {
+namespace mob {
     class Image
     {
         HANDLE handle_;

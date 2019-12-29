@@ -1,6 +1,6 @@
 #include "Image.h"
 
-namespace micbinz
+namespace mob
 {
 
     Image::Image(std::wstring name) :

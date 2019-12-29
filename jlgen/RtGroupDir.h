@@ -9,7 +9,7 @@
 
 #include "winicon.h"
 
-namespace micbinz
+namespace mob
 {
 namespace windows
 {
