@@ -27,7 +27,7 @@
     <ClCompile Include="util_console_app.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="RtGroupDir.cpp">
+    <ClCompile Include="RtIconGroup.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
@@ -44,7 +44,7 @@
     <ClInclude Include="util_console_app.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="RtGroupDir.h">
+    <ClInclude Include="RtIconGroup.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

@@ -14,7 +14,7 @@
 #include "winicon.h"
 #include "ResourceMgr.h"
 #include "Image.h"
-#include "RtGroupDir.h"
+#include "RtIconGroup.h"
 
 
 static void ErrorHandler( const char* msg )
@@ -578,7 +578,7 @@ static void UpdateIcon_3(
     free(pIconDir);
     free(pIconGrp);
 
-    mob::windows::RtGroupDir gd{ exeFile };
+    mob::windows::RtIconGroup gd{ exeFile };
 
     gd.Dump();
 }

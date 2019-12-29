@@ -13,17 +13,23 @@ namespace mob
 {
 namespace windows
 {
-    class RtGroupDir
+    /**
+     * Resource type icon group.
+     */
+    class RtIconGroup
     {
         PGRPICONDIR dir_;
 
         void Dump(int idx, PGRPICONDIRENTRY iconDirEntry);
 
     public:
-        RtGroupDir(std::wstring exeName);
-        ~RtGroupDir();
+        RtIconGroup(std::wstring exeName);
+        RtIconGroup(int id, std::wstring exeName);
+        ~RtIconGroup();
 
         void Dump();
+
+        static RtIconGroup fromFile();
     };
 
 } // namespace windows

@@ -1,33 +1,27 @@
 
 #include <iostream>
 #include <stdexcept>
-#include "RtGroupDir.h"
+#include "RtIconGroup.h"
 
 namespace mob
 {
 namespace windows
 {
 
-RtGroupDir::RtGroupDir(std::wstring executableName)
+RtIconGroup::RtIconGroup(std::wstring executableName)
 {
-    HGLOBAL hResLoad;   // handle to loaded resource
-    HMODULE hExe;       // handle to existing .EXE file
-    HRSRC hRes;         // handle/ptr. to res. info. in hExe
-    HANDLE hUpdateRes;  // update resource handle
-    BOOL result;
-
-    // Load the .EXE file.
-    hExe = LoadLibrary(executableName.c_str());
+    // Load the executable.
+    HMODULE hExe = LoadLibrary(executableName.c_str());
     if (hExe == NULL)
         throw std::invalid_argument("Could not load exe.");
 
     // Locate the resource in the .EXE file.
-    hRes = FindResource(hExe, MAKEINTRESOURCE(312), RT_GROUP_ICON);
+    HRSRC hRes = FindResource(hExe, MAKEINTRESOURCE(312), RT_GROUP_ICON);
     if (hRes == NULL)
         throw std::invalid_argument("Could not locate icons.");
 
-    // Load the resource into global memory.
-    hResLoad = LoadResource(hExe, hRes);
+    // Load the resource.
+    HGLOBAL hResLoad = LoadResource(hExe, hRes);
     if (hResLoad == NULL)
         throw std::invalid_argument("Could not load dialog box.");
 
@@ -37,12 +31,35 @@ RtGroupDir::RtGroupDir(std::wstring executableName)
         throw std::invalid_argument("Could not lock dialog box.");
 }
 
-RtGroupDir::~RtGroupDir() 
+RtIconGroup::RtIconGroup(int id, std::wstring executableName)
+{
+    // Load the executable.
+    HMODULE hExe = LoadLibrary(executableName.c_str());
+    if (hExe == NULL)
+        throw std::invalid_argument("Could not load exe.");
+
+    // Locate the resource in the .EXE file.
+    HRSRC hRes = FindResource(hExe, MAKEINTRESOURCE(id), RT_GROUP_ICON);
+    if (hRes == NULL)
+        throw std::invalid_argument("Could not locate icons.");
+
+    // Load the resource.
+    HGLOBAL hResLoad = LoadResource(hExe, hRes);
+    if (hResLoad == NULL)
+        throw std::invalid_argument("Could not load dialog box.");
+
+    // Lock the resource into global memory.
+    dir_ = (PGRPICONDIR)LockResource(hResLoad);
+    if (dir_ == NULL)
+        throw std::invalid_argument("Could not lock dialog box.");
+}
+
+RtIconGroup::~RtIconGroup()
 {
 
 }
 
-void RtGroupDir::Dump()
+void RtIconGroup::Dump()
 {
     if (dir_->idReserved != 0 || dir_->idType != 1)
     {
@@ -65,7 +82,7 @@ void RtGroupDir::Dump()
         Dump(i, &dir_->idEntries[i]);
 }
 
-void RtGroupDir::Dump(int idx, PGRPICONDIRENTRY iconDirEntry)
+void RtIconGroup::Dump(int idx, PGRPICONDIRENTRY iconDirEntry)
 {
     std::cout << "ICONDIRENTRY[" << idx << "] " <<
         " w=" << (int)iconDirEntry->bWidth <<
@@ -74,6 +91,11 @@ void RtGroupDir::Dump(int idx, PGRPICONDIRENTRY iconDirEntry)
         " byteCount=" << iconDirEntry->dwBytesInRes <<
         " id=" << iconDirEntry->nId <<
         std::endl;
+}
+
+RtIconGroup RtIconGroup::fromFile()
+{
+    return RtIconGroup( L"bad" );
 }
 
 } // namespace windows
