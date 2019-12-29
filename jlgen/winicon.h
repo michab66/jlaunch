@@ -1,15 +1,16 @@
+/*
+ * Copyright Microsoft
+ *
+ * See https://devblogs.microsoft.com/oldnewthing/20120720-00/?p=7083
+ */
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-
 #pragma once
-
 #pragma pack(2)
 
-// See https://devblogs.microsoft.com/oldnewthing/20120720-00/?p=7083
-
 //icon file dir entry
-typedef struct
+typedef struct ICONDIRENTRY_
 {
     BYTE        bWidth;          // Width, in pixels, of the image
     BYTE        bHeight;         // Height, in pixels, of the image
@@ -21,9 +22,8 @@ typedef struct
     DWORD       dwImageOffset;   // Where in the file is this image?
 } ICONDIRENTRY, *PICONDIRENTRY;
 
-
 //icon file header
-typedef struct
+typedef struct ICONDIR_
 {
     WORD           idReserved;   // Reserved (must be 0)
     WORD           idType;       // Resource Type (1 for icons)
@@ -32,7 +32,7 @@ typedef struct
 } ICONDIR, *PICONDIR;
 
 //icon file image
-typedef struct
+typedef struct ICONIMAGE_
 {
     BITMAPINFOHEADER   icHeader;      // DIB header
     RGBQUAD         icColors[1];   // Color table
@@ -40,7 +40,7 @@ typedef struct
     BYTE            icAND[1];      // DIB bits for AND mask
 } ICONIMAGE, * LPICONIMAGE;
 
-typedef struct
+typedef struct GRPICONDIRENTRY_
 {
     BYTE  bWidth;
     BYTE  bHeight;
@@ -52,7 +52,7 @@ typedef struct
     WORD  nId;
 } GRPICONDIRENTRY, * PGRPICONDIRENTRY;
 
-typedef struct
+typedef struct GRPICONDIR_
 {
     WORD idReserved;
     WORD idType;
