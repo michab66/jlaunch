@@ -11,7 +11,7 @@
 #include "winicon.h"
 #include "ResourceMgr.h"
 #include "Image.h"
-#include "GroupDir.h"
+#include "RtGroupDir.h"
 
 
 static void ErrorHandler( const char* msg )
@@ -463,7 +463,6 @@ static void UpdateIcon_2(
                 ErrorHandler("Could not add resource.");
                 return;
             }
-
         }
 
         // Then, free the associated memory
@@ -572,12 +571,11 @@ static void UpdateIcon_3(
         return;
     }
 
-
     // Clean up the ICONDIR memory
     free(pIconDir);
     free(pIconGrp);
 
-    GroupDir gd{ exeFile };
+    micbinz::windows::RtGroupDir gd{ exeFile };
 
     gd.Dump();
 }

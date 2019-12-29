@@ -1,9 +1,14 @@
 
 #include <iostream>
 #include <stdexcept>
-#include "GroupDir.h"
+#include "RtGroupDir.h"
 
-GroupDir::GroupDir(std::wstring executableName)
+namespace micbinz
+{
+namespace windows
+{
+
+RtGroupDir::RtGroupDir(std::wstring executableName)
 {
     HGLOBAL hResLoad;   // handle to loaded resource
     HMODULE hExe;       // handle to existing .EXE file
@@ -32,12 +37,12 @@ GroupDir::GroupDir(std::wstring executableName)
         throw std::invalid_argument("Could not lock dialog box.");
 }
 
-GroupDir::~GroupDir() 
+RtGroupDir::~RtGroupDir() 
 {
 
 }
 
-void GroupDir::Dump()
+void RtGroupDir::Dump()
 {
     if (dir_->idReserved != 0 || dir_->idType != 1)
     {
@@ -60,7 +65,7 @@ void GroupDir::Dump()
         Dump(i, &dir_->idEntries[i]);
 }
 
-void GroupDir::Dump(int idx, PGRPICONDIRENTRY iconDirEntry)
+void RtGroupDir::Dump(int idx, PGRPICONDIRENTRY iconDirEntry)
 {
     std::cout << "ICONDIRENTRY[" << idx << "] " <<
         " w=" << (int)iconDirEntry->bWidth <<
@@ -70,3 +75,6 @@ void GroupDir::Dump(int idx, PGRPICONDIRENTRY iconDirEntry)
         " id=" << iconDirEntry->nId <<
         std::endl;
 }
+
+} // namespace windows
+} // namespace micbinz
