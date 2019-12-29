@@ -100,9 +100,9 @@ static DWORD sizeofGroup(PGRPICONDIR dir)
     return result;
 }
 
-static void UpdateIcon_2(
-    LPCTSTR iconFile, 
-    unsigned int resId, 
+static void UpdateIcon(
+    LPCTSTR iconFile,
+    unsigned int resId,
     LPCTSTR exeFile)
 {
     HANDLE hUpdateRes;  // update resource handle
@@ -166,7 +166,7 @@ static void UpdateIcon_2(
         (pIconGrp->idEntries[i]).wBitCount = (pIconDir->idEntries[i]).wBitCount;
         (pIconGrp->idEntries[i]).dwBytesInRes = (pIconDir->idEntries[i]).dwBytesInRes;
         // Note that we must not generate zero-based ids.
-        (pIconGrp->idEntries[i]).nId = i+1;
+        (pIconGrp->idEntries[i]).nId = i + 1;
     }
 
     dump(pIconGrp);
@@ -209,7 +209,7 @@ static void UpdateIcon_2(
                 MAKEINTRESOURCE(pIconGrp->idEntries[i].nId),         // icon id
                 MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),  // neutral language
                 pIconImage,                         // ptr to resource info      
-                pIconDir->idEntries[i].dwBytesInRes );       // size of resource info                
+                pIconDir->idEntries[i].dwBytesInRes);       // size of resource info                
 
             if (result == FALSE)
             {
@@ -258,7 +258,7 @@ int wmain( int argc, wchar_t** argv )
     //    std::cout << "Hello World! " << success << std::endl ;
         //UpdateIcon(iconName.c_str(), 0, 312, exeName.c_str());
     //    updateResource_1(L"C:\\cygwin64\\tmp\\jlaunch\\x64\\Debug\\jlaunchKopie.exe", 312, exeName.c_str());
-        UpdateIcon_2(
+        UpdateIcon(
             iconName.c_str(),
             312,
             exeName.c_str());

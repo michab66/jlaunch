@@ -1,4 +1,8 @@
-
+/*
+ * $Id$
+ *
+ * Copyright (c) 2019 Michael Binz
+ */
 #include <iostream>
 #include <string>
 
@@ -7,7 +11,8 @@
 namespace mob
 {
 
-ResourceMgr::ResourceMgr(std::wstring exeFileName) {
+ResourceMgr::ResourceMgr(std::wstring exeFileName) 
+{
     handle_ = BeginUpdateResource(
         exeFileName.c_str(),
         TRUE);
@@ -15,7 +20,14 @@ ResourceMgr::ResourceMgr(std::wstring exeFileName) {
     std::cout << "handle is " << handle_ << std::endl;
 }
 
-ResourceMgr::~ResourceMgr() {
+ResourceMgr::~ResourceMgr() 
+{
+    if ( handle_ )
+        commit();
+}
+
+void ResourceMgr::commit()
+{
     // TODO error handling exc
     BOOL success = EndUpdateResource(handle_, FALSE);
 
@@ -27,7 +39,8 @@ ResourceMgr::~ResourceMgr() {
 /**
  * Update a string resource.
  */
-BOOL ResourceMgr::updateString(int resourceId, std::wstring value) {
+BOOL ResourceMgr::updateString(int resourceId, std::wstring value) 
+{
     return UpdateResource(
         handle_,
         RT_STRING,
@@ -38,7 +51,8 @@ BOOL ResourceMgr::updateString(int resourceId, std::wstring value) {
     // TODO error handling exc
 }
 
-std::string get_file_string2( std::wstring name ) {
+std::string get_file_string2( std::wstring name ) 
+{
     std::ifstream       file(name);
     /*
         * Get the size of the file
@@ -79,4 +93,4 @@ BOOL ResourceMgr::updateIcon(int resourceId, mob::Image icon) {
     return 1;
 }
 
-} // micbinz
+} // mob

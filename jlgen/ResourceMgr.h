@@ -28,8 +28,9 @@ namespace mob {
 
     public:
         ResourceMgr(std::wstring exeFileName);
-
         ~ResourceMgr();
+
+        void commit();
 
         /**
          * Update a string resource.
@@ -41,5 +42,7 @@ namespace mob {
          */
         BOOL updateIcon(int resourceId, mob::Image iconPathName);
         BOOL updateIcon(int resourceId, std::wstring iconPathName);
+
+
     };
 } // micbinz
