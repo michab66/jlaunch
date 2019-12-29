@@ -1,5 +1,8 @@
-// jlgen.cpp : Diese Datei enthält die Funktion "main". Hier beginnt und endet die Ausführung des Programms.
-//
+/*
+ * $Id$
+ *
+ * Copyright 2019 Michael Binz
+ */
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>

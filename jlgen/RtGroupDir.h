@@ -1,7 +1,7 @@
-/**
+/*
  * $Id$
  *
- * Copyright 2019 Michael Binz
+ * Copyright (c) 2019 Michael Binz
  */
 #pragma once
 
