@@ -6,8 +6,10 @@
 #pragma once
 
 #include <string>
+#include <vector>
 
 #include "winicon.h"
+#include "RtIcon.h"
 
 namespace mob
 {
@@ -20,6 +22,12 @@ namespace windows
     {
         PGRPICONDIR dir_;
 
+        std::vector<RtIcon> icons_;
+
+        RtIconGroup(PGRPICONDIR dir, std::vector<RtIcon> icons) :
+            dir_(dir),
+            icons_(icons) {};
+
         void Dump(int idx, PGRPICONDIRENTRY iconDirEntry);
 
     public:
@@ -29,7 +37,7 @@ namespace windows
 
         void Dump();
 
-        static RtIconGroup fromFile();
+        static RtIconGroup fromFile(std::wstring iconFile);
     };
 
 } // namespace windows

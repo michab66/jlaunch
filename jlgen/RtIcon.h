@@ -14,22 +14,16 @@ namespace mob
 namespace windows
 {
     /**
-     * Resource type icon group.
+     * Resource type icon.
      */
-    class RtGroupDir
+    class RtIcon
     {
-        PGRPICONDIR dir_;
-
-        void Dump(int idx, PGRPICONDIRENTRY iconDirEntry);
+        LPVOID iconData_;
 
     public:
-        RtGroupDir(std::wstring exeName);
-        RtGroupDir(int id, std::wstring exeName);
-        ~RtGroupDir();
+        RtIcon(HANDLE file, PICONDIRENTRY);
+        ~RtIcon();
 
-        void Dump();
-
-        static RtGroupDir fromFile();
     };
 
 } // namespace windows

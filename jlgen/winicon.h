@@ -19,7 +19,7 @@ typedef struct
     WORD        wBitCount;       // Bits per pixel
     DWORD       dwBytesInRes;    // How many bytes in this resource?
     DWORD       dwImageOffset;   // Where in the file is this image?
-} ICONDIRENTRY, * LPICONDIRENTRY;
+} ICONDIRENTRY, *PICONDIRENTRY;
 
 
 //icon file header
@@ -29,7 +29,7 @@ typedef struct
     WORD           idType;       // Resource Type (1 for icons)
     WORD           idCount;      // How many images?
     ICONDIRENTRY   idEntries[1]; // An entry for each image (idCount of 'em)
-} ICONDIR, * LPICONDIR;
+} ICONDIR, *PICONDIR;
 
 //icon file image
 typedef struct

@@ -151,6 +151,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="RtIcon.cpp" />
     <ClCompile Include="RtIconGroup.cpp" />
     <ClCompile Include="Image.cpp" />
     <ClCompile Include="jlgen.cpp" />
@@ -158,6 +159,7 @@
     <ClCompile Include="util_console_app.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="RtIcon.h" />
     <ClInclude Include="RtIconGroup.h" />
     <ClInclude Include="Image.h" />
     <ClInclude Include="ResourceMgr.h" />
