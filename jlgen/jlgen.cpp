@@ -235,6 +235,22 @@ static void UpdateIcon(
     free(pIconGrp);
 }
 
+static void UpdateIcon_2(
+    LPCTSTR iconFile,
+    unsigned int resId,
+    LPCTSTR exeFile)
+{
+    using mob::windows::RtIconGroup;
+
+    mob::ResourceMgr target{ exeFile };
+
+    RtIconGroup icon{ iconFile };
+
+    target.addIcon(resId, icon);
+
+    target.commit();
+}
+
 int wmain( int argc, wchar_t** argv )
 {
     if (argc != 3)
@@ -258,7 +274,7 @@ int wmain( int argc, wchar_t** argv )
     //    std::cout << "Hello World! " << success << std::endl ;
         //UpdateIcon(iconName.c_str(), 0, 312, exeName.c_str());
     //    updateResource_1(L"C:\\cygwin64\\tmp\\jlaunch\\x64\\Debug\\jlaunchKopie.exe", 312, exeName.c_str());
-        UpdateIcon(
+        UpdateIcon_2(
             iconName.c_str(),
             312,
             exeName.c_str());

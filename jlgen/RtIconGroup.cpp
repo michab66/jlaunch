@@ -75,29 +75,6 @@ namespace mob
 namespace windows
 {
 
-RtIconGroup::RtIconGroup(std::wstring executableName)
-{
-    // Load the executable.
-    HMODULE hExe = LoadLibrary(executableName.c_str());
-    if (hExe == NULL)
-        throw std::invalid_argument("Could not load exe.");
-
-    // Locate the resource in the .EXE file.
-    HRSRC hRes = FindResource(hExe, MAKEINTRESOURCE(312), RT_GROUP_ICON);
-    if (hRes == NULL)
-        throw std::invalid_argument("Could not locate icons.");
-
-    // Load the resource.
-    HGLOBAL hResLoad = LoadResource(hExe, hRes);
-    if (hResLoad == NULL)
-        throw std::invalid_argument("Could not load dialog box.");
-
-    // Lock the resource into global memory.
-    dir_ = (PGRPICONDIR)LockResource(hResLoad);
-    if (dir_ == NULL)
-        throw std::invalid_argument("Could not lock dialog box.");
-}
-
 RtIconGroup::RtIconGroup(int id, std::wstring executableName)
 {
     // Load the executable.
@@ -116,59 +93,32 @@ RtIconGroup::RtIconGroup(int id, std::wstring executableName)
         throw std::invalid_argument("Could not load dialog box.");
 
     // Lock the resource into global memory.
-    dir_ = (PGRPICONDIR)LockResource(hResLoad);
-    if (dir_ == NULL)
+    PGRPICONDIR dir = (PGRPICONDIR)LockResource(hResLoad);
+    if (dir == NULL)
         throw std::invalid_argument("Could not lock dialog box.");
-}
 
-RtIconGroup::~RtIconGroup()
-{
-
-}
-
-void RtIconGroup::Dump()
-{
-    if (dir_->idReserved != 0 || dir_->idType != 1)
-    {
-        std::cout <<
-            "Not an ICONDIR. idReserved= " <<
-            dir_->idReserved <<
-            ", idType=" <<
-            dir_->idType <<
-            std::endl;
-        return;
-    }
-
-    std::cout <<
-        "ICONDIR contains " <<
-        dir_->idCount <<
-        " icons." <<
-        std::endl;
+    // Perform a copy to be in-line with the icon file reader.
+    int resourceSize = 
+        SizeofResource(hExe, hRes);
+    dir_ = (PGRPICONDIR)malloc(resourceSize);
+    memcpy(dir_, dir, resourceSize);
 
     for (int i = 0; i < dir_->idCount; ++i)
-        Dump(i, &dir_->idEntries[i]);
+    {
+        RtIcon* c = new RtIcon(dir_->idEntries[i].nId, hExe);
+        icons_.push_back(c);
+    }
 }
 
-void RtIconGroup::Dump(int idx, PGRPICONDIRENTRY iconDirEntry)
-{
-    std::cout << "ICONDIRENTRY[" << idx << "] " <<
-        " w=" << (int)iconDirEntry->bWidth <<
-        " h=" << (int)iconDirEntry->bHeight <<
-        " colorCount=" << (int)iconDirEntry->bColorCount <<
-        " byteCount=" << iconDirEntry->dwBytesInRes <<
-        " id=" << iconDirEntry->nId <<
-        std::endl;
-}
-
-RtIconGroup RtIconGroup::fromFile(std::wstring iconFile)
+RtIconGroup::RtIconGroup(std::wstring iconFile)
 {
     HANDLE hFile = CreateFile(
-        iconFile.c_str(), 
+        iconFile.c_str(),
         GENERIC_READ | GENERIC_WRITE,
         FILE_SHARE_READ | FILE_SHARE_WRITE,
         NULL,
         OPEN_EXISTING,
-        FILE_FLAG_SEQUENTIAL_SCAN, 
+        FILE_FLAG_SEQUENTIAL_SCAN,
         0);
 
     if (hFile == INVALID_HANDLE_VALUE)
@@ -206,39 +156,104 @@ RtIconGroup RtIconGroup::fromFile(std::wstring iconFile)
 
     // Convert.
 
-    PGRPICONDIR pIconGrp =
+    dir_ =
         (PGRPICONDIR)malloc(sizeof(GRPICONDIR) + ((pIconDir->idCount - 1) * sizeof(GRPICONDIRENTRY)));
-    pIconGrp->idReserved = pIconDir->idReserved;
-    pIconGrp->idCount = pIconDir->idCount;
-    pIconGrp->idType = pIconDir->idType;
+    dir_->idReserved = pIconDir->idReserved;
+    dir_->idCount = pIconDir->idCount;
+    dir_->idType = pIconDir->idType;
 
-    for (int i = 0; i < pIconGrp->idCount; ++i)
+    for (int i = 0; i < dir_->idCount; ++i)
     {
-        (pIconGrp->idEntries[i]).bWidth = (pIconDir->idEntries[i]).bWidth;
-        (pIconGrp->idEntries[i]).bHeight = (pIconDir->idEntries[i]).bHeight;
-        (pIconGrp->idEntries[i]).bColorCount = (pIconDir->idEntries[i]).bColorCount;
-        (pIconGrp->idEntries[i]).bReserved = (pIconDir->idEntries[i]).bReserved;
-        (pIconGrp->idEntries[i]).wPlanes = (pIconDir->idEntries[i]).wPlanes;
-        (pIconGrp->idEntries[i]).wBitCount = (pIconDir->idEntries[i]).wBitCount;
-        (pIconGrp->idEntries[i]).dwBytesInRes = (pIconDir->idEntries[i]).dwBytesInRes;
+        (dir_->idEntries[i]).bWidth = (pIconDir->idEntries[i]).bWidth;
+        (dir_->idEntries[i]).bHeight = (pIconDir->idEntries[i]).bHeight;
+        (dir_->idEntries[i]).bColorCount = (pIconDir->idEntries[i]).bColorCount;
+        (dir_->idEntries[i]).bReserved = (pIconDir->idEntries[i]).bReserved;
+        (dir_->idEntries[i]).wPlanes = (pIconDir->idEntries[i]).wPlanes;
+        (dir_->idEntries[i]).wBitCount = (pIconDir->idEntries[i]).wBitCount;
+        (dir_->idEntries[i]).dwBytesInRes = (pIconDir->idEntries[i]).dwBytesInRes;
         // Note that we must not generate zero-based ids.
-        (pIconGrp->idEntries[i]).nId = i + 1;
+        (dir_->idEntries[i]).nId = i + 1;
     }
 
-    dump(pIconGrp);
-
-    std::vector<RtIcon> icons;
+    dump(dir_);
 
     // Loop through and read in each image
     for (WORD i = 0; i < pIconDir->idCount; i++)
     {
-        RtIcon c{ hFile, &pIconDir->idEntries[i] };
-        icons.push_back(c);
+        RtIcon* c = new RtIcon{ hFile, &pIconDir->idEntries[i] };
+        icons_.push_back(c);
+    }
+}
+
+RtIconGroup::~RtIconGroup()
+{
+    free(dir_);
+
+    for (int i = 0; i < icons_.size(); ++i)
+    {
+        RtIcon* c = icons_[i];
+        delete c;
+    }
+    icons_.clear();
+}
+
+DWORD RtIconGroup::sizeofGroup()
+{
+    DWORD result =
+        sizeof(GRPICONDIR);
+    result +=
+        (dir_->idCount - 1) *
+        sizeof(GRPICONDIRENTRY);
+    return result;
+}
+
+void RtIconGroup::update(HANDLE resourceHolder, int resourceId)
+{
+    BOOL result = UpdateResource(
+        resourceHolder,    // update resource handle
+        RT_GROUP_ICON,                         // change dialog box resource
+        MAKEINTRESOURCE(resourceId),         // dialog box id
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),  // neutral language
+        dir_,                         // ptr to resource info
+        sizeofGroup());       // size of resource info
+
+    if (!result)
+        throw std::invalid_argument("Update failed.");
+
+}
+
+void RtIconGroup::Dump()
+{
+    if (dir_->idReserved != 0 || dir_->idType != 1)
+    {
+        std::cout <<
+            "Not an ICONDIR. idReserved= " <<
+            dir_->idReserved <<
+            ", idType=" <<
+            dir_->idType <<
+            std::endl;
+        return;
     }
 
-    RtIconGroup result{ pIconGrp, icons };
+    std::cout <<
+        "ICONDIR contains " <<
+        dir_->idCount <<
+        " icons." <<
+        std::endl;
 
-    return result;
+    for (int i = 0; i < dir_->idCount; ++i)
+        Dump(i, &dir_->idEntries[i]);
+}
+
+void RtIconGroup::Dump(int idx, PGRPICONDIRENTRY iconDirEntry)
+{
+    std::cout << "ICONDIRENTRY[" << idx << "] " <<
+        " w=" << (int)iconDirEntry->bWidth <<
+        " h=" << (int)iconDirEntry->bHeight <<
+        " colorCount=" << (int)iconDirEntry->bColorCount <<
+        " byteCount=" << iconDirEntry->dwBytesInRes <<
+        " id=" << iconDirEntry->nId <<
+        std::endl;
 }
 
 } // namespace windows

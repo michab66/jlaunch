@@ -15,8 +15,10 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <vector>
 
 #include "Image.h"
+#include "RtIconGroup.h"
 
 namespace mob {
     // https://github.com/BillyONeal/Instalog/blob/master/LogCommon/Win32Exception.hpp
@@ -40,7 +42,7 @@ namespace mob {
         /**
          * Update an icon resource.
          */
-        BOOL updateIcon(int resourceId, mob::Image iconPathName);
+        void addIcon(int resourceId, mob::windows::RtIconGroup icon);
         BOOL updateIcon(int resourceId, std::wstring iconPathName);
 
 

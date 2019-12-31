@@ -7,6 +7,7 @@
 #include <string>
 
 #include "ResourceMgr.h"
+#include "RtIconGroup.h"
 
 namespace mob
 {
@@ -69,28 +70,8 @@ std::string get_file_string2( std::wstring name )
 /**
  * Update an icon resource.
  */
-BOOL ResourceMgr::updateIcon(int resourceId, std::wstring iconPathName) {
-    
-    std::string iconBuffer =
-        get_file_string2(iconPathName);
-
-    std::cout << "Length is " << iconBuffer.length() << std::endl;
-
-    return UpdateResource(
-        handle_,
-        RT_ICON,
-        MAKEINTRESOURCE(resourceId),
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),
-        (LPVOID*)iconBuffer.c_str()+22,
-        (DWORD)iconBuffer.length()-22);
-    // TODO error handling exc
-}
-
-/**
- * Update an icon resource.
- */
-BOOL ResourceMgr::updateIcon(int resourceId, mob::Image icon) {
-    return 1;
+void ResourceMgr::addIcon(int resourceId, mob::windows::RtIconGroup icon) {
+    icon.update(handle_, resourceId);
 }
 
 } // mob

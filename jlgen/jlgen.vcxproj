@@ -151,6 +151,8 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="RtBase.cpp" />
+    <ClCompile Include="RtBinary.cpp" />
     <ClCompile Include="RtIcon.cpp" />
     <ClCompile Include="RtIconGroup.cpp" />
     <ClCompile Include="Image.cpp" />
@@ -159,6 +161,8 @@
     <ClCompile Include="util_console_app.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="RtBase.h" />
+    <ClInclude Include="RtBinary.h" />
     <ClInclude Include="RtIcon.h" />
     <ClInclude Include="RtIconGroup.h" />
     <ClInclude Include="Image.h" />

@@ -9,6 +9,7 @@
 #include <vector>
 
 #include "winicon.h"
+#include "RtBase.h"
 #include "RtIcon.h"
 
 namespace mob
@@ -18,26 +19,28 @@ namespace windows
     /**
      * Resource type icon group.
      */
-    class RtIconGroup
+    class RtIconGroup : RtBase
     {
+        // malloced
         PGRPICONDIR dir_;
 
-        std::vector<RtIcon> icons_;
+        std::vector<RtIcon*> icons_;
 
-        RtIconGroup(PGRPICONDIR dir, std::vector<RtIcon> icons) :
-            dir_(dir),
-            icons_(icons) {};
+        RtIconGroup() :
+            dir_(nullptr) {};
 
         void Dump(int idx, PGRPICONDIRENTRY iconDirEntry);
 
+        DWORD sizeofGroup();
+
     public:
-        RtIconGroup(std::wstring exeName);
-        RtIconGroup(int id, std::wstring exeName);
+        RtIconGroup(std::wstring iconFile);
+        RtIconGroup(int resourceId, std::wstring exeName);
         ~RtIconGroup();
 
-        void Dump();
+        void update(HANDLE resourceHolder, int resourceId);
 
-        static RtIconGroup fromFile(std::wstring iconFile);
+        void Dump();
     };
 
 } // namespace windows
