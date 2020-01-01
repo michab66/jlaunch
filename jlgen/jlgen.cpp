@@ -11,99 +11,17 @@
 #include <string>
 #include <iostream>
 
+#include "util_console_app.hpp"
+
 #include "winicon.h"
 #include "ResourceMgr.h"
 #include "Image.h"
 #include "RtIconGroup.h"
 
-
-static void ErrorHandler( const char* msg )
-{
-    printf("%s\n", msg);
-    exit(1);
-}
-
-static void dump(int idx, PICONDIRENTRY iconDirEntry)
-{
-    std::cout << "ICONDIRENTRY[" << idx << "] " << 
-        " w=" << (int)iconDirEntry->bWidth <<
-        " h=" << (int)iconDirEntry->bHeight <<
-        " colorCount=" << (int)iconDirEntry->bColorCount <<
-        " byteCount=" << iconDirEntry->dwBytesInRes <<
-        " offset=" << iconDirEntry->dwImageOffset <<
-        std::endl;
-}
-static void dump(int idx, PGRPICONDIRENTRY iconDirEntry)
-{
-    std::cout << "ICONDIRENTRY[" << idx << "] " <<
-        " w=" << (int)iconDirEntry->bWidth <<
-        " h=" << (int)iconDirEntry->bHeight <<
-        " colorCount=" << (int)iconDirEntry->bColorCount <<
-        " byteCount=" << iconDirEntry->dwBytesInRes <<
-        " id=" << iconDirEntry->nId <<
-        std::endl;
-}
-
-static void dump(PICONDIR iconDirEntry)
-{
-    if (iconDirEntry->idReserved != 0 || iconDirEntry->idType != 1)
-    {
-        std::cout <<
-            "Not an ICONDIR. idReserved= " <<
-            iconDirEntry->idReserved <<
-            ", idType=" <<
-            iconDirEntry->idType <<
-            std::endl;
-        return;
-    }
-
-    std::cout <<
-        "ICONDIR contains " <<
-        iconDirEntry->idCount <<
-        " icons." <<
-        std::endl;
-
-    for (int i = 0; i < iconDirEntry->idCount; ++i)
-        dump(i, &iconDirEntry->idEntries[i]);
-}
-
-static void dump(PGRPICONDIR iconDirEntry)
-{
-    if (iconDirEntry->idReserved != 0 || iconDirEntry->idType != 1)
-    {
-        std::cout <<
-            "Not an ICONDIR. idReserved= " <<
-            iconDirEntry->idReserved <<
-            ", idType=" <<
-            iconDirEntry->idType <<
-            std::endl;
-        return;
-    }
-
-    std::cout <<
-        "ICONDIR contains " <<
-        iconDirEntry->idCount <<
-        " icons." <<
-        std::endl;
-
-    for (int i = 0; i < iconDirEntry->idCount; ++i)
-        dump(i, &iconDirEntry->idEntries[i]);
-}
-
-static DWORD sizeofGroup(PGRPICONDIR dir)
-{
-    DWORD result = 
-        sizeof(GRPICONDIR);
-    result += 
-        (dir->idCount - 1) * 
-        sizeof(GRPICONDIRENTRY);
-    return result;
-}
-
-static void UpdateIcon_2(
-    LPCTSTR iconFile,
-    unsigned int resId,
-    LPCTSTR exeFile)
+static int UpdateIcon(
+    std::string exeFile,
+    int resId,
+    std::string iconFile)
 {
     using mob::windows::RtIconGroup;
 
@@ -114,28 +32,31 @@ static void UpdateIcon_2(
     target.addIcon(resId, icon);
 
     target.commit();
+
+    return 0;
 }
 
-int wmain( int argc, wchar_t** argv )
-{
-    if (argc != 3)
-    {
-        std::cout << "Not three" << std::endl;
-        return 1;
-    }
-    try
-    {
-        std::wstring exeName{ argv[1] };
-        std::wstring iconName{ argv[2] };
+static int execute(const std::vector<std::string>& argv) {
+    using smack::util::Commands;
+    using std::string;
 
-        UpdateIcon_2(
-            iconName.c_str(),
-            312,
-            exeName.c_str());
-    }
-    catch (std::invalid_argument & e) {
-        std::cout << "Error: " << e.what() << std::endl;
+    auto cmd1 = Commands<string, int, string>::make(
+            "UpdateIcon",
+            UpdateIcon);
 
-        return EXIT_FAILURE;
-    }
+    auto cli = smack::util::makeCliApplication(
+        cmd1
+    );
+
+    return cli.launch(argv);
+}
+
+int main(int argc, char** argv) {
+    std::cout << argv[0] << std::endl;
+
+    std::vector<std::string> cmdArgv(
+        argv + 1,
+        argv + argc);
+
+    return execute(cmdArgv);
 }

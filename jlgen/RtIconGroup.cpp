@@ -75,7 +75,7 @@ namespace mob
 namespace windows
 {
 
-RtIconGroup::RtIconGroup(int id, std::wstring executableName)
+RtIconGroup::RtIconGroup(int id, std::string executableName)
 {
     // Load the executable.
     HMODULE hExe = LoadLibrary(executableName.c_str());
@@ -110,7 +110,7 @@ RtIconGroup::RtIconGroup(int id, std::wstring executableName)
     }
 }
 
-RtIconGroup::RtIconGroup(std::wstring iconFile)
+RtIconGroup::RtIconGroup(std::string iconFile)
 {
     HANDLE hFile = CreateFile(
         iconFile.c_str(),
@@ -260,4 +260,4 @@ void RtIconGroup::Dump(int idx, PGRPICONDIRENTRY iconDirEntry)
 }
 
 } // namespace windows
-} // namespace micbinz
+} // namespace mob

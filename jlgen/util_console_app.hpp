@@ -1,5 +1,5 @@
 /*
- * Copyright © 2019 Daimler TSS
+ * Copyright © 2019 Michael Binz
  */
 
 #pragma once
@@ -19,7 +19,7 @@
 #include <typeinfo>
 #include <vector>
 
-namespace tss {
+namespace smack {
 namespace util {
 
 using std::string;
@@ -346,4 +346,4 @@ public:
 };
 
 } // namespace util
-} // namespace tss
+} // namespace smack

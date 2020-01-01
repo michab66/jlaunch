@@ -1,6 +1,7 @@
 #pragma once
 
 #define WIN32_LEAN_AND_MEAN
+#undef UNICODE
 #include <windows.h>
 
 namespace mob

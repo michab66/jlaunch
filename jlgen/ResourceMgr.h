@@ -9,6 +9,7 @@
 #pragma once
 
 #define WIN32_LEAN_AND_MEAN
+#undef UNICODE
 #include <windows.h>
 
 #include <string>
@@ -29,7 +30,7 @@ namespace mob {
         HANDLE handle_;
 
     public:
-        ResourceMgr(std::wstring exeFileName);
+        ResourceMgr(std::string exeFileName);
         ~ResourceMgr();
 
         void commit();
@@ -37,14 +38,11 @@ namespace mob {
         /**
          * Update a string resource.
          */
-        BOOL updateString(int resourceId, std::wstring value);
+        BOOL updateString(int resourceId, std::string value);
 
         /**
          * Update an icon resource.
          */
         void addIcon(int resourceId, mob::windows::RtIconGroup& icon);
-        BOOL updateIcon(int resourceId, std::wstring iconPathName);
-
-
     };
-} // micbinz
+} // mob

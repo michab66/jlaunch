@@ -12,7 +12,7 @@
 namespace mob
 {
 
-ResourceMgr::ResourceMgr(std::wstring exeFileName) 
+ResourceMgr::ResourceMgr(std::string exeFileName) 
 {
     handle_ = BeginUpdateResource(
         exeFileName.c_str(),
@@ -40,7 +40,7 @@ void ResourceMgr::commit()
 /**
  * Update a string resource.
  */
-BOOL ResourceMgr::updateString(int resourceId, std::wstring value) 
+BOOL ResourceMgr::updateString(int resourceId, std::string value) 
 {
     return UpdateResource(
         handle_,

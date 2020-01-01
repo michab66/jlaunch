@@ -36,8 +36,8 @@ namespace windows
         DWORD sizeofGroup();
 
     public:
-        RtIconGroup(std::wstring iconFile);
-        RtIconGroup(int resourceId, std::wstring exeName);
+        RtIconGroup(std::string iconFile);
+        RtIconGroup(int resourceId, std::string exeName);
         ~RtIconGroup();
 
         void update(HANDLE resourceHolder, int resourceId);
