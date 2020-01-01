@@ -42,7 +42,7 @@ namespace mob {
         /**
          * Update an icon resource.
          */
-        void addIcon(int resourceId, mob::windows::RtIconGroup icon);
+        void addIcon(int resourceId, mob::windows::RtIconGroup& icon);
         BOOL updateIcon(int resourceId, std::wstring iconPathName);
 
 

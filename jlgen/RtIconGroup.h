@@ -21,6 +21,8 @@ namespace windows
      */
     class RtIconGroup : RtBase
     {
+        RtIconGroup(RtIconGroup const&) = delete;
+
         // malloced
         PGRPICONDIR dir_;
 

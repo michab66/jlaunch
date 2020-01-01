@@ -17,8 +17,9 @@ ResourceMgr::ResourceMgr(std::wstring exeFileName)
     handle_ = BeginUpdateResource(
         exeFileName.c_str(),
         TRUE);
-    // TODO error handling exc
-    std::cout << "handle is " << handle_ << std::endl;
+
+    if (!handle_)
+        throw std::invalid_argument("BeginUpdateResource() failed.");
 }
 
 ResourceMgr::~ResourceMgr() 
@@ -29,10 +30,9 @@ ResourceMgr::~ResourceMgr()
 
 void ResourceMgr::commit()
 {
-    // TODO error handling exc
     BOOL success = EndUpdateResource(handle_, FALSE);
-
-    std::cout << "dtor " << success << std::endl;
+    if (!success)
+        throw std::invalid_argument("EndUpdateResource() failed.");
 
     handle_ = nullptr;
 }
@@ -52,7 +52,7 @@ BOOL ResourceMgr::updateString(int resourceId, std::wstring value)
     // TODO error handling exc
 }
 
-std::string get_file_string2( std::wstring name ) 
+std::string get_hfile_string2( std::wstring name ) 
 {
     std::ifstream       file(name);
     /*
@@ -70,7 +70,7 @@ std::string get_file_string2( std::wstring name )
 /**
  * Update an icon resource.
  */
-void ResourceMgr::addIcon(int resourceId, mob::windows::RtIconGroup icon) {
+void ResourceMgr::addIcon(int resourceId, mob::windows::RtIconGroup& icon) {
     icon.update(handle_, resourceId);
 }
 

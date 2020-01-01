@@ -220,6 +220,9 @@ void RtIconGroup::update(HANDLE resourceHolder, int resourceId)
     if (!result)
         throw std::invalid_argument("Update failed.");
 
+    int idCount = 0;
+    for (auto& c : icons_)
+        c->update(resourceHolder, ++idCount);
 }
 
 void RtIconGroup::Dump()
