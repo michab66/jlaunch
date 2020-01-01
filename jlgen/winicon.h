@@ -34,11 +34,11 @@ typedef struct ICONDIR_
 //icon file image
 typedef struct ICONIMAGE_
 {
-    BITMAPINFOHEADER   icHeader;      // DIB header
+    BITMAPINFOHEADER   icHeader;   // DIB header
     RGBQUAD         icColors[1];   // Color table
     BYTE            icXOR[1];      // DIB bits for XOR mask
     BYTE            icAND[1];      // DIB bits for AND mask
-} ICONIMAGE, * LPICONIMAGE;
+} ICONIMAGE, *PICONIMAGE;
 
 typedef struct GRPICONDIRENTRY_
 {
@@ -50,7 +50,7 @@ typedef struct GRPICONDIRENTRY_
     WORD  wBitCount;
     DWORD dwBytesInRes;
     WORD  nId;
-} GRPICONDIRENTRY, * PGRPICONDIRENTRY;
+} GRPICONDIRENTRY, *PGRPICONDIRENTRY;
 
 typedef struct GRPICONDIR_
 {
@@ -58,4 +58,4 @@ typedef struct GRPICONDIR_
     WORD idType;
     WORD idCount;
     GRPICONDIRENTRY idEntries[1];
-} GRPICONDIR, * PGRPICONDIR;
+} GRPICONDIR, *PGRPICONDIR;

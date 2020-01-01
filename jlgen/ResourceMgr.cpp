@@ -38,36 +38,6 @@ void ResourceMgr::commit()
 }
 
 /**
- * Update a string resource.
- */
-BOOL ResourceMgr::updateString(int resourceId, std::string value) 
-{
-    return UpdateResource(
-        handle_,
-        RT_STRING,
-        MAKEINTRESOURCE(resourceId),
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),
-        (LPVOID*)value.c_str(),
-        (DWORD)value.length());
-    // TODO error handling exc
-}
-
-std::string get_hfile_string2( std::wstring name ) 
-{
-    std::ifstream       file(name);
-    /*
-        * Get the size of the file
-        */
-    file.seekg(0, std::ios::end);
-    std::streampos          length = file.tellg();
-    file.seekg(0, std::ios::beg);
-    std::string       buffer(length, 0);
-    file.read(&buffer[0], length);
-
-    return buffer;
-}
-
-/**
  * Update an icon resource.
  */
 void ResourceMgr::addIcon(int resourceId, mob::windows::RtIconGroup& icon) {
