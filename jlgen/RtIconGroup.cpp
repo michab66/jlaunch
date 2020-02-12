@@ -78,7 +78,7 @@ namespace windows
 RtIconGroup::RtIconGroup(int id, std::string executableName)
 {
     // Load the executable.
-    HMODULE hExe = LoadLibrary(executableName.c_str());
+    HMODULE hExe = LoadLibraryA(executableName.c_str());
     if (hExe == NULL)
         throw std::invalid_argument("Could not load exe.");
 
@@ -112,7 +112,7 @@ RtIconGroup::RtIconGroup(int id, std::string executableName)
 
 RtIconGroup::RtIconGroup(std::string iconFile)
 {
-    HANDLE hFile = CreateFile(
+    HANDLE hFile = CreateFileA(
         iconFile.c_str(),
         GENERIC_READ | GENERIC_WRITE,
         FILE_SHARE_READ | FILE_SHARE_WRITE,

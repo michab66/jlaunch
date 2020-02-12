@@ -4,6 +4,8 @@
  * Copyright (c) 2019 Michael Binz
  */
 
+#undef UNICODE
+
 #include <cstdio>
 #include <string>
 #include <iostream>
@@ -14,6 +16,7 @@
 #include "ResourceMgr.h"
 #include "Image.h"
 #include "RtIconGroup.h"
+#include "resource.h"
 
 static int UpdateIcon(
     std::string exeFile,
@@ -33,16 +36,65 @@ static int UpdateIcon(
     return 0;
 }
 
+static int WriteLauncher(
+    std::string targetFile)
+{
+    HMODULE self = GetModuleHandleA(nullptr);
+
+    // Locate the resource in the .EXE file.
+    HRSRC hRes = FindResourceA(
+        self,
+        MAKEINTRESOURCE(IDR_BINARY1),
+        RT_RCDATA);
+    if (hRes == NULL)
+        throw std::invalid_argument("Could not locate binary resource.");
+
+    // Load the resource.
+    HGLOBAL hResLoad = LoadResource(
+        self,
+        hRes);
+    if (hResLoad == NULL)
+        throw std::invalid_argument("Could not load resource.");
+
+    // Lock the resource into global memory.
+    PGRPICONDIR dir = (PGRPICONDIR)LockResource(hResLoad);
+    if (dir == NULL)
+        throw std::invalid_argument("Could not lock resource.");
+
+    // Perform a copy to be in-line with the icon file reader.
+    int resourceSize =
+        SizeofResource(nullptr, hRes);
+
+    std::ofstream out;
+    out.open(targetFile.c_str(), std::ofstream::binary);
+    if ( out.fail() )
+        throw std::invalid_argument("Could not open target file.");
+
+    out.write((const char*)dir, resourceSize);
+    if (out.fail())
+        throw std::invalid_argument("Could not write to target file.");
+
+    out.close();
+    if (out.fail())
+        throw std::invalid_argument("Could not close target file.");
+
+    return 0;
+}
+
 static int execute(const std::vector<std::string>& argv) {
     using smack::util::Commands;
     using std::string;
 
     auto cmd1 = Commands<string, int, string>::make(
-            "UpdateIcon",
-            UpdateIcon);
+        "UpdateIcon",
+        UpdateIcon);
+    auto cmd2 = Commands<string>::make(
+        "WriteLauncher",
+        WriteLauncher);
 
     auto cli = smack::util::makeCliApplication(
-        cmd1
+        cmd1,
+        cmd2
     );
 
     return cli.launch(argv);

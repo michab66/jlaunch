@@ -161,6 +161,7 @@
     <ClCompile Include="util_console_app.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="resource.h" />
     <ClInclude Include="RtBase.h" />
     <ClInclude Include="RtBinary.h" />
     <ClInclude Include="RtIcon.h" />
@@ -169,6 +170,12 @@
     <ClInclude Include="ResourceMgr.h" />
     <ClInclude Include="util_console_app.hpp" />
     <ClInclude Include="winicon.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="..\x64\Release\jlaunch.exe" />
+  </ItemGroup>
+  <ItemGroup>
+    <ResourceCompile Include="jlgen.rc" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
