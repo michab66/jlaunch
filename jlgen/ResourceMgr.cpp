@@ -43,5 +43,8 @@ void ResourceMgr::commit()
 void ResourceMgr::addIcon(int resourceId, mob::windows::RtIconGroup& icon) {
     icon.update(handle_, resourceId);
 }
+void ResourceMgr::addString(int resourceId, mob::windows::RtString& icon) {
+    icon.update(handle_, resourceId);
+}
 
 } // mob

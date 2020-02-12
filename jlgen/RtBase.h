@@ -1,3 +1,9 @@
+/*
+ * $Id$
+ *
+ * Copyright (c) 2019-2020 Michael Binz
+ */
+
 #pragma once
 
 #define WIN32_LEAN_AND_MEAN

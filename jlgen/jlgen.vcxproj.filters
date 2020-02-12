@@ -33,10 +33,10 @@
     <ClCompile Include="RtIcon.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="RtBinary.cpp">
+    <ClCompile Include="RtBase.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="RtBase.cpp">
+    <ClCompile Include="RtString.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,13 +59,13 @@
     <ClInclude Include="RtIcon.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="RtBinary.h">
-      <Filter>Headerdateien</Filter>
-    </ClInclude>
     <ClInclude Include="RtBase.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="resource.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="RtString.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

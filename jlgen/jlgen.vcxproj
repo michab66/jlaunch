@@ -152,7 +152,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="RtBase.cpp" />
-    <ClCompile Include="RtBinary.cpp" />
+    <ClCompile Include="RtString.cpp" />
     <ClCompile Include="RtIcon.cpp" />
     <ClCompile Include="RtIconGroup.cpp" />
     <ClCompile Include="Image.cpp" />
@@ -163,7 +163,7 @@
   <ItemGroup>
     <ClInclude Include="resource.h" />
     <ClInclude Include="RtBase.h" />
-    <ClInclude Include="RtBinary.h" />
+    <ClInclude Include="RtString.h" />
     <ClInclude Include="RtIcon.h" />
     <ClInclude Include="RtIconGroup.h" />
     <ClInclude Include="Image.h" />

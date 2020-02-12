@@ -20,6 +20,7 @@
 
 #include "Image.h"
 #include "RtIconGroup.h"
+#include "RtString.h"
 
 namespace mob {
     // https://github.com/BillyONeal/Instalog/blob/master/LogCommon/Win32Exception.hpp
@@ -38,7 +39,7 @@ namespace mob {
         /**
          * Update a string resource.
          */
-        BOOL updateString(int resourceId, std::string value);
+        void addString(int resourceId, mob::windows::RtString& string);
 
         /**
          * Update an icon resource.

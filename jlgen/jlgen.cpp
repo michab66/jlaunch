@@ -1,9 +1,10 @@
 /*
  * $Id$
  *
- * Copyright (c) 2019 Michael Binz
+ * Copyright (c) 2019-2020 Michael Binz
  */
 
+// See https://docs.microsoft.com/en-us/windows/uwp/design/globalizing/use-utf8-code-page
 #undef UNICODE
 
 #include <cstdio>
@@ -16,6 +17,7 @@
 #include "ResourceMgr.h"
 #include "Image.h"
 #include "RtIconGroup.h"
+#include "RtString.h"
 #include "resource.h"
 
 static int UpdateIcon(
@@ -30,6 +32,24 @@ static int UpdateIcon(
     RtIconGroup icon{ iconFile };
 
     target.addIcon(resId, icon);
+
+    target.commit();
+
+    return 0;
+}
+
+static int UpdateString(
+    std::string exeFile,
+    int resId,
+    std::string text)
+{
+    using mob::windows::RtIconGroup;
+
+    mob::ResourceMgr target{ exeFile };
+
+    mob::windows::RtString string{ text };
+
+    target.addString(resId, string);
 
     target.commit();
 
@@ -81,6 +101,17 @@ static int WriteLauncher(
     return 0;
 }
 
+static int MakeLauncher(
+    std::string targetFile,
+    std::string iconFile,
+    std::string moduleName,
+    std::string startClass
+)
+{
+
+    return 0;
+}
+
 static int execute(const std::vector<std::string>& argv) {
     using smack::util::Commands;
     using std::string;
@@ -91,10 +122,14 @@ static int execute(const std::vector<std::string>& argv) {
     auto cmd2 = Commands<string>::make(
         "WriteLauncher",
         WriteLauncher);
+    auto cmd3 = Commands<string,string,string,string>::make(
+        "MakeLauncher",
+        MakeLauncher);
 
     auto cli = smack::util::makeCliApplication(
         cmd1,
-        cmd2
+        cmd2,
+        cmd3
     );
 
     return cli.launch(argv);

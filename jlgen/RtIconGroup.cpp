@@ -1,3 +1,8 @@
+/*
+ * $Id$
+ *
+ * Copyright (c) 2019-2020 Michael Binz
+ */
 
 #include <iostream>
 #include <stdexcept>
