@@ -36,7 +36,7 @@
     <ClCompile Include="RtBase.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
-    <ClCompile Include="RtString.cpp">
+    <ClCompile Include="RtStringTable.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
   </ItemGroup>
@@ -65,7 +65,7 @@
     <ClInclude Include="resource.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
-    <ClInclude Include="RtString.h">
+    <ClInclude Include="RtStringTable.h">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>

@@ -10,7 +10,7 @@
 #include <vector>
 #include <string>
 
-#include "RtString.h"
+#include "RtStringTable.h"
 
 template<typename T>
 void bang(std::vector<uint8_t>& v, size_t size, const T* value)
@@ -21,8 +21,11 @@ void bang(std::vector<uint8_t>& v, size_t size, const T* value)
         v.push_back(pointer[i]);
 }
 
-// https://devblogs.microsoft.com/oldnewthing/20040130-00/?p=40813
-// https://binaryworld.net/Main/CodeDetail.aspx?CodeId=3778
+/**
+ * Make a resource string table.
+ * https://devblogs.microsoft.com/oldnewthing/20040130-00/?p=40813
+ * https://binaryworld.net/Main/CodeDetail.aspx?CodeId=3778
+ */
 void mob::windows::RtString::update(HANDLE resourceHolder, int resourceId)
 {
     if (strings_.empty())
@@ -30,8 +33,9 @@ void mob::windows::RtString::update(HANDLE resourceHolder, int resourceId)
 
     int bundle1 = (strings_.begin()->first / 16) + 1;
     int bundle2 = (strings_.rbegin()->first / 16) + 1;
+    // Currently the code writes only a single bundle of string entries.
     if (bundle1 != bundle2)
-        return; // Error.
+        throw std::invalid_argument("Only single bundle supported.");
 
     std::vector<uint8_t> buffer;
 

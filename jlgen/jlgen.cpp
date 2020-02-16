@@ -17,7 +17,7 @@
 #include "ResourceMgr.h"
 #include "Image.h"
 #include "RtIconGroup.h"
-#include "RtString.h"
+#include "RtStringTable.h"
 #include "resource.h"
 
 static int UpdateIcon(
@@ -97,14 +97,10 @@ static int MakeLauncher(
     mob::windows::RtString strings;
     strings.Add(314, startClass);
     strings.Add(313, moduleName);
-
     target.addString(313, strings);
-
     target.commit();
 
-    //UpdateString(targetFile, 313, moduleName);
-    //UpdateString(targetFile, 314, startClass);
- //   UpdateIcon(targetFile, 312, iconFile);
+    UpdateIcon(targetFile, 312, iconFile);
 
     return 0;
 }

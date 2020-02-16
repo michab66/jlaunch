@@ -20,7 +20,7 @@
 
 #include "Image.h"
 #include "RtIconGroup.h"
-#include "RtString.h"
+#include "RtStringTable.h"
 
 namespace mob {
     // https://github.com/BillyONeal/Instalog/blob/master/LogCommon/Win32Exception.hpp
