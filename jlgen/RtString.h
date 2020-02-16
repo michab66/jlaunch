@@ -1,5 +1,6 @@
 #pragma once
 
+#include <map>
 #include <string>
 
 #include "RtBase.h"
@@ -14,11 +15,16 @@ namespace windows
  */
 class RtString : RtBase
 {
-    std::string value_;
+    std::map<int, std::string> strings_;
 
 public:
-    RtString(std::string value) : value_(value) 
+    RtString()
     {
+    }
+
+    void Add(int id, std::string value)
+    {
+        strings_[id] = value;
     }
 
     void update(HANDLE resourceHolder, int resourceId);

@@ -38,24 +38,6 @@ static int UpdateIcon(
     return 0;
 }
 
-static int UpdateString(
-    std::string exeFile,
-    int resId,
-    std::string text)
-{
-    using mob::windows::RtIconGroup;
-
-    mob::ResourceMgr target{ exeFile };
-
-    mob::windows::RtString string{ text };
-
-    target.addString(resId, string);
-
-    target.commit();
-
-    return 0;
-}
-
 static int WriteLauncher(
     std::string targetFile)
 {
@@ -108,6 +90,21 @@ static int MakeLauncher(
     std::string startClass
 )
 {
+    WriteLauncher(targetFile);
+
+    mob::ResourceMgr target{ targetFile };
+
+    mob::windows::RtString strings;
+    strings.Add(314, startClass);
+    strings.Add(313, moduleName);
+
+    target.addString(313, strings);
+
+    target.commit();
+
+    //UpdateString(targetFile, 313, moduleName);
+    //UpdateString(targetFile, 314, startClass);
+ //   UpdateIcon(targetFile, 312, iconFile);
 
     return 0;
 }
@@ -116,7 +113,7 @@ static int execute(const std::vector<std::string>& argv) {
     using smack::util::Commands;
     using std::string;
 
-    auto cmd1 = Commands<string, int, string>::make(
+    auto cmd0 = Commands<string, int, string>::make(
         "UpdateIcon",
         UpdateIcon);
     auto cmd2 = Commands<string>::make(
@@ -127,7 +124,7 @@ static int execute(const std::vector<std::string>& argv) {
         MakeLauncher);
 
     auto cli = smack::util::makeCliApplication(
-        cmd1,
+        cmd0,
         cmd2,
         cmd3
     );
@@ -135,6 +132,7 @@ static int execute(const std::vector<std::string>& argv) {
     return cli.launch(argv);
 }
 
+// MakeLauncher c:\cygwin64\tmp\xxx.exe C:\cygwin64\tmp\jlaunch\MMT.ico app.mmt de/michab/app/mmt/Mmt
 int main(int argc, char** argv) {
     std::cout << argv[0] << std::endl;
 
