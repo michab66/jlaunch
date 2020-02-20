@@ -191,6 +191,9 @@ int APIENTRY micbinzwWinMain(
 }
 #pragma comment(lib, "gdiplus.lib")
 
+// Internet hacked.  The original code is from microsoft.
+// Switch to MS solution.
+// https://docs.microsoft.com/en-us/windows/win32/gdiplus/-gdiplus-retrieving-the-class-identifier-for-an-encoder-use
 static size_t GetImageEncoder(const wchar_t* form, CLSID* clsID)
 {
     size_t nRet = -1;
@@ -207,6 +210,7 @@ static size_t GetImageEncoder(const wchar_t* form, CLSID* clsID)
     {
         if (wcscmp(imageCodecs[index].MimeType, form) == 0)
         {
+            Gdiplus::ImageCodecInfo* current = &imageCodecs[index];
             *clsID = imageCodecs[index].Clsid;
             nRet = index;
             break;
@@ -218,6 +222,9 @@ static size_t GetImageEncoder(const wchar_t* form, CLSID* clsID)
     return nRet;
 }
 
+/**
+ * Compute the passed bitmap's mime type.
+ */
 static std::wstring GetMimeType(Gdiplus::Bitmap* bitmap)
 {
     GUID raw;
@@ -237,7 +244,7 @@ static std::wstring GetMimeType(Gdiplus::Bitmap* bitmap)
     Gdiplus::ImageCodecInfo* tbuffer = 
         (Gdiplus::ImageCodecInfo*)buffer;
 
-    for (int i = 0; i < numDecoders; i++)
+    for (size_t i = 0; i < numDecoders; ++i)
     {
         Gdiplus::ImageCodecInfo* current = &tbuffer[i];
 
@@ -294,15 +301,6 @@ int wmain(int argc, _TCHAR* argv[])
     Gdiplus::GdiplusStartupInputEx gdiStartupInput;
     ULONG_PTR gdiplustoken;
     Gdiplus::GdiplusStartup(&gdiplustoken, &gdiStartupInput, NULL);
-    std::map<std::wstring, std::wstring> m_mtMap;
-    m_mtMap[L".jpeg"] = L"image/jpeg";
-    m_mtMap[L".jpe"] = L"image/jpeg";
-    m_mtMap[L".jpg"] = L"image/jpeg";
-    m_mtMap[L".png"] = L"image/png";
-    m_mtMap[L".gif"] = L"image/gif";
-    m_mtMap[L".tiff"] = L"image/tiff";
-    m_mtMap[L".tif"] = L"image/tiff";
-    m_mtMap[L".bmp"] = L"image/bmp";
 
     std::wstring strfilePath = L"C:\\cygwin64\\tmp\\800px-Sunflower_from_Silesia2.png";
     std::wstring strdup = L"C:\\cygwin64\\tmp\\cpp.png";
@@ -311,7 +309,7 @@ int wmain(int argc, _TCHAR* argv[])
     std::wstring mimeType = GetMimeType(bitMap);
 
     std::wcout << "micbinz: guid=" << mimeType << std::endl;
-
+    Gdiplus::GetEncoderClsid
     Gdiplus::Bitmap* sqeezed = new Gdiplus::Bitmap(128, 128, PixelFormat32bppRGB);
 
     Gdiplus::Graphics* graphic = Gdiplus::Graphics::FromImage(sqeezed);
@@ -320,7 +318,7 @@ int wmain(int argc, _TCHAR* argv[])
     graphic->SetSmoothingMode(Gdiplus::SmoothingMode::SmoothingModeHighQuality);
     graphic->DrawImage(bitMap, 0, 0, 128, 128);
     CLSID encoderCLSID;
-    GetImageEncoder(m_mtMap[L".png"].c_str(), &encoderCLSID);
+    GetImageEncoder(mimeType.c_str(), &encoderCLSID);
     sqeezed->Save(strdup.c_str(), &encoderCLSID);
 
     delete bitMap;
