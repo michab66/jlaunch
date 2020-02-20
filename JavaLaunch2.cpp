@@ -8,13 +8,17 @@
 
 #include <array>
 
+#define GDIPVER     0x0110
+
 #include <tchar.h>
-#define WIN32_LEAN_AND_MEAN
+//#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
+#include <Gdiplus.h>
 
 #include <jni.h>
 #include <iostream>
 #include <string>
+#include <map>
 
 // Get our resource definitions.
 #include "resource.h"
@@ -76,7 +80,7 @@ static std::string getStringResource( HINSTANCE instance, UINT id )
 /*
  * Windows entry point.
  */
-int APIENTRY wWinMain(
+int APIENTRY micbinzwWinMain(
     _In_ HINSTANCE hInstance,
     _In_opt_ HINSTANCE hPrevInstance,
     _In_ LPWSTR    lpCmdLine,
@@ -183,5 +187,145 @@ int APIENTRY wWinMain(
     // Waits until the VM terminates.
     javaVM->DestroyJavaVM();
 
+    return 0;
+}
+#pragma comment(lib, "gdiplus.lib")
+
+static size_t GetImageEncoder(const wchar_t* form, CLSID* clsID)
+{
+    size_t nRet = -1;
+    unsigned int encodersCount = 0;
+    unsigned int encodersSize = 0;
+    Gdiplus::ImageCodecInfo* imageCodecs = nullptr;
+
+    Gdiplus::GetImageEncodersSize(&encodersCount, &encodersSize);
+
+    imageCodecs = (Gdiplus::ImageCodecInfo*)malloc(encodersSize);
+
+    Gdiplus::GetImageEncoders(encodersCount, encodersSize, imageCodecs);
+    for (size_t index = 0; index < encodersCount; index++)
+    {
+        if (wcscmp(imageCodecs[index].MimeType, form) == 0)
+        {
+            *clsID = imageCodecs[index].Clsid;
+            nRet = index;
+            break;
+        }
+    }
+
+    if (imageCodecs)
+        free(imageCodecs);
+    return nRet;
+}
+
+static std::wstring GetMimeType(Gdiplus::Bitmap* bitmap)
+{
+    GUID raw;
+    bitmap->GetRawFormat(&raw);
+
+    UINT numDecoders;
+    UINT size;
+    Gdiplus::GetImageDecodersSize( &numDecoders, &size );
+    
+    uint8_t* buffer = new uint8_t[ size ];
+
+    Gdiplus::GetImageDecoders(
+        numDecoders, 
+        size,
+        (Gdiplus::ImageCodecInfo*)buffer);
+
+    Gdiplus::ImageCodecInfo* tbuffer = 
+        (Gdiplus::ImageCodecInfo*)buffer;
+
+    for (int i = 0; i < numDecoders; i++)
+    {
+        Gdiplus::ImageCodecInfo* current = &tbuffer[i];
+
+        std::wcout << i << " : " << current->MimeType << std::endl;
+
+        if (current->FormatID == raw)
+        {
+            std::wstring result = current->MimeType;
+            delete[] buffer;
+            return result;
+        }
+    }
+
+    delete[] buffer;
+    std::wstring empty;
+    return empty;
+}
+
+static void writeImage(
+    std::wstring strdup,
+    uint32_t width, 
+    uint32_t height,
+    Gdiplus::Bitmap* bitMap)
+{
+    std::map<std::wstring, std::wstring> m_mtMap;
+    m_mtMap[L".jpeg"] = L"image/jpeg";
+    m_mtMap[L".jpe"] = L"image/jpeg";
+    m_mtMap[L".jpg"] = L"image/jpeg";
+    m_mtMap[L".png"] = L"image/png";
+    m_mtMap[L".gif"] = L"image/gif";
+    m_mtMap[L".tiff"] = L"image/tiff";
+    m_mtMap[L".tif"] = L"image/tiff";
+    m_mtMap[L".bmp"] = L"image/bmp";
+
+    Gdiplus::Bitmap* sqeezed  = new Gdiplus::Bitmap(128, 128, PixelFormat32bppARGB);
+
+    Gdiplus::Graphics* graphic = Gdiplus::Graphics::FromImage(sqeezed);
+    graphic->SetCompositingQuality(Gdiplus::CompositingQuality::CompositingQualityHighQuality);
+    graphic->SetInterpolationMode(Gdiplus::InterpolationMode::InterpolationModeHighQualityBilinear);
+    graphic->SetSmoothingMode(Gdiplus::SmoothingMode::SmoothingModeHighQuality);
+    graphic->DrawImage(bitMap, 0, 0, 128, 128);
+    CLSID encoderCLSID;
+    GetImageEncoder(m_mtMap[L".jpg"].c_str(), &encoderCLSID);
+    sqeezed->Save(strdup.c_str(), &encoderCLSID);
+
+    delete sqeezed;
+}
+
+// https://devblogs.microsoft.com/oldnewthing/20101022-00/?p=12473
+// https://stackoverflow.com/questions/51383896/c-gdibitmap-to-png-image-in-memory
+
+int wmain(int argc, _TCHAR* argv[])
+{
+    Gdiplus::GdiplusStartupInputEx gdiStartupInput;
+    ULONG_PTR gdiplustoken;
+    Gdiplus::GdiplusStartup(&gdiplustoken, &gdiStartupInput, NULL);
+    std::map<std::wstring, std::wstring> m_mtMap;
+    m_mtMap[L".jpeg"] = L"image/jpeg";
+    m_mtMap[L".jpe"] = L"image/jpeg";
+    m_mtMap[L".jpg"] = L"image/jpeg";
+    m_mtMap[L".png"] = L"image/png";
+    m_mtMap[L".gif"] = L"image/gif";
+    m_mtMap[L".tiff"] = L"image/tiff";
+    m_mtMap[L".tif"] = L"image/tiff";
+    m_mtMap[L".bmp"] = L"image/bmp";
+
+    std::wstring strfilePath = L"C:\\cygwin64\\tmp\\800px-Sunflower_from_Silesia2.png";
+    std::wstring strdup = L"C:\\cygwin64\\tmp\\cpp.png";
+    Gdiplus::Bitmap* bitMap = new Gdiplus::Bitmap(strfilePath.c_str());
+
+    std::wstring mimeType = GetMimeType(bitMap);
+
+    std::wcout << "micbinz: guid=" << mimeType << std::endl;
+
+    Gdiplus::Bitmap* sqeezed = new Gdiplus::Bitmap(128, 128, PixelFormat32bppRGB);
+
+    Gdiplus::Graphics* graphic = Gdiplus::Graphics::FromImage(sqeezed);
+    graphic->SetCompositingQuality(Gdiplus::CompositingQuality::CompositingQualityHighQuality);
+    graphic->SetInterpolationMode(Gdiplus::InterpolationMode::InterpolationModeBilinear);
+    graphic->SetSmoothingMode(Gdiplus::SmoothingMode::SmoothingModeHighQuality);
+    graphic->DrawImage(bitMap, 0, 0, 128, 128);
+    CLSID encoderCLSID;
+    GetImageEncoder(m_mtMap[L".png"].c_str(), &encoderCLSID);
+    sqeezed->Save(strdup.c_str(), &encoderCLSID);
+
+    delete bitMap;
+    delete sqeezed;
+
+    Gdiplus::GdiplusShutdown(gdiplustoken);
     return 0;
 }
