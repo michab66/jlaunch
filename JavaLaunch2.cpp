@@ -14,6 +14,7 @@
 //#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <Gdiplus.h>
+#include "Shlwapi.h"
 
 #include <jni.h>
 #include <iostream>
@@ -190,6 +191,7 @@ int APIENTRY micbinzwWinMain(
     return 0;
 }
 #pragma comment(lib, "gdiplus.lib")
+#pragma comment(lib, "Shlwapi.lib")
 
 // Internet hacked.  The original code is from microsoft.
 // Switch to MS solution.
@@ -234,15 +236,15 @@ static std::wstring GetMimeType(Gdiplus::Bitmap* bitmap)
     UINT size;
     Gdiplus::GetImageDecodersSize( &numDecoders, &size );
     
-    uint8_t* buffer = new uint8_t[ size ];
+    std::unique_ptr<uint8_t[]> buffer(new uint8_t[size]);
 
     Gdiplus::GetImageDecoders(
         numDecoders, 
         size,
-        (Gdiplus::ImageCodecInfo*)buffer);
+        (Gdiplus::ImageCodecInfo*)&buffer[0]);
 
     Gdiplus::ImageCodecInfo* tbuffer = 
-        (Gdiplus::ImageCodecInfo*)buffer;
+        (Gdiplus::ImageCodecInfo*) &buffer[0];
 
     for (size_t i = 0; i < numDecoders; ++i)
     {
@@ -253,12 +255,10 @@ static std::wstring GetMimeType(Gdiplus::Bitmap* bitmap)
         if (current->FormatID == raw)
         {
             std::wstring result = current->MimeType;
-            delete[] buffer;
             return result;
         }
     }
 
-    delete[] buffer;
     std::wstring empty;
     return empty;
 }
@@ -302,14 +302,26 @@ int wmain(int argc, _TCHAR* argv[])
     ULONG_PTR gdiplustoken;
     Gdiplus::GdiplusStartup(&gdiplustoken, &gdiStartupInput, NULL);
 
-    std::wstring strfilePath = L"C:\\cygwin64\\tmp\\800px-Sunflower_from_Silesia2.png";
-    std::wstring strdup = L"C:\\cygwin64\\tmp\\cpp.png";
+    std::wstring strfilePath = L"mmt-icon-1024.png";
+    std::wstring strdup = L"mmt-icon-128.png";
     Gdiplus::Bitmap* bitMap = new Gdiplus::Bitmap(strfilePath.c_str());
+
+    TCHAR currentDir[1024];
+
+    GetCurrentDirectory(
+        sizeof currentDir,
+        currentDir
+    );
+
+    BOOL exists = PathFileExistsW(strfilePath.c_str() );
+    if (!exists)
+        return 1;
 
     std::wstring mimeType = GetMimeType(bitMap);
 
     std::wcout << "micbinz: guid=" << mimeType << std::endl;
 
+//    Gdiplus::Bitmap* sqeezed = new Gdiplus::Bitmap(128, 128, PixelFormat32bppRGB);
     Gdiplus::Bitmap* sqeezed = new Gdiplus::Bitmap(128, 128, PixelFormat32bppRGB);
 
     Gdiplus::Graphics* graphic = Gdiplus::Graphics::FromImage(sqeezed);

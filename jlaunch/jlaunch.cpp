@@ -109,7 +109,7 @@ int APIENTRY wWinMain(
     };
 
     JavaVMInitArgs vmArgs{
-        JNI_VERSION_10,
+        JNI_VERSION_1_8,
         static_cast<jint>(jvmopt.size()),
         jvmopt.data(),
         JNI_FALSE
