@@ -135,7 +135,6 @@ namespace
 
         delete sqeezed;
     }
-
 } // unnamed namespace.
 
 /**
@@ -145,10 +144,6 @@ namespace
  */
 void WriteImageSet(const wstring& sourceFile)
 {
-    Gdiplus::GdiplusStartupInputEx gdiStartupInput;
-    ULONG_PTR gdiplustoken;
-    Gdiplus::GdiplusStartup(&gdiplustoken, &gdiStartupInput, nullptr);
-
     if (!PathFileExistsW(sourceFile.c_str()))
         throw std::invalid_argument("File not found.");
 
