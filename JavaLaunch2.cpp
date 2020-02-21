@@ -38,58 +38,19 @@ namespace
     wstring GetSuffix(const wstring& path)
     {
         auto lastIdx = path.find_last_of(L".");
-        if (lastIdx == std::wstring::npos)
-            return std::wstring{};
+        if (lastIdx == wstring::npos)
+            return wstring{};
 
         return path.substr(lastIdx);
     }
 
-    std::wstring GetPath(const wstring& path)
+    wstring GetPath(const wstring& path)
     {
         auto lastIdx = path.find_last_of(L".");
-        if (lastIdx == std::wstring::npos)
-            return std::wstring{};
+        if (lastIdx == wstring::npos)
+            return wstring{};
 
         return path.substr(0,lastIdx);
-    }
-
-    /**
-     * Compute the passed bitmap's mime type.
-     */
-    std::wstring GetMimeType(Gdiplus::Bitmap* bitmap)
-    {
-        GUID raw;
-        bitmap->GetRawFormat(&raw);
-
-        UINT numDecoders;
-        UINT size;
-        Gdiplus::GetImageDecodersSize(&numDecoders, &size);
-
-        std::unique_ptr<uint8_t[]> buffer(new uint8_t[size]);
-
-        Gdiplus::GetImageDecoders(
-            numDecoders,
-            size,
-            (Gdiplus::ImageCodecInfo*) & buffer[0]);
-
-        Gdiplus::ImageCodecInfo* tbuffer =
-            (Gdiplus::ImageCodecInfo*) & buffer[0];
-
-        for (size_t i = 0; i < numDecoders; ++i)
-        {
-            Gdiplus::ImageCodecInfo* current = &tbuffer[i];
-
-            std::wcout << i << " : " << current->MimeType << std::endl;
-
-            if (current->FormatID == raw)
-            {
-                std::wstring result = current->MimeType;
-                return result;
-            }
-        }
-
-        std::wstring empty;
-        return empty;
     }
 
     /**
@@ -177,9 +138,6 @@ namespace
 
 } // unnamed namespace.
 
-// https://devblogs.microsoft.com/oldnewthing/20101022-00/?p=12473
-// https://stackoverflow.com/questions/51383896/c-gdibitmap-to-png-image-in-memory
-
 /**
  * Use the passed image to create a set of scaled, square images in the
  * dimensions 16, 32, 64, 128, 256.  It is recommended to pass a square
@@ -187,8 +145,6 @@ namespace
  */
 void WriteImageSet(const wstring& sourceFile)
 {
-    using std::wstring;
-
     Gdiplus::GdiplusStartupInputEx gdiStartupInput;
     ULONG_PTR gdiplustoken;
     Gdiplus::GdiplusStartup(&gdiplustoken, &gdiStartupInput, nullptr);
@@ -221,7 +177,7 @@ int wmain(int argc, _TCHAR* argv[])
     ULONG_PTR gdiplustoken;
     Gdiplus::GdiplusStartup(&gdiplustoken, &gdiStartupInput, nullptr);
 
-    std::wstring strfilePath =
+    wstring strfilePath =
         L"mmt-icon-1024.png";
 
     WriteImageSet(strfilePath);
