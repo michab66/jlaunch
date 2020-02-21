@@ -1,9 +1,9 @@
 /*
- * Simplest Java Launcher.
+ * $Id$
  *
- * Copyright (c) 2019 Michael G. Binz
+ * Icon routines.
  *
- * LGPL
+ * Copyright (c) 2019-2020 Michael G. Binz
  */
 
 // Resources
