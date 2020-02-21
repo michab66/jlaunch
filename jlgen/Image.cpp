@@ -2,8 +2,9 @@
 
 namespace mob
 {
+    using std::wstring;
 
-    Image::Image(std::wstring name) :
+    Image::Image(wstring name) :
         handle_(0) {
         handle_ = LoadImageW(
             nullptr,

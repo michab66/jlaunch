@@ -12,6 +12,9 @@
 
 #include "RtStringTable.h"
 
+using std::string;
+using std::wstring;
+
 template<typename T>
 void bang(std::vector<uint8_t>& v, size_t size, const T* value)
 {
@@ -55,7 +58,7 @@ void mob::windows::RtString::update(HANDLE resourceHolder, int resourceId)
             bang(buffer, sizeof(len), &len);
             
             std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-            std::wstring wstr = converter.from_bytes(c->second);
+            wstring wstr = converter.from_bytes(c->second);
             const wchar_t* contents = wstr.c_str();
             bang(buffer, wstr.length() * sizeof(wchar_t), contents);
         }
