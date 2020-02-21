@@ -32,6 +32,8 @@
 #pragma comment(lib, "Shlwapi.lib")
 
 using std::wstring;
+using Gdiplus::Graphics;
+using Gdiplus::Bitmap;
 
 namespace
 {
@@ -56,10 +58,10 @@ namespace
     /**
      * Compute the passed bitmap's Clsid.
      */
-    CLSID GetClsid(Gdiplus::Bitmap* bitmap)
+    CLSID GetClsid(Bitmap& bitmap)
     {
         GUID raw;
-        bitmap->GetRawFormat(&raw);
+        bitmap.GetRawFormat(&raw);
 
         UINT numDecoders;
         UINT size;
@@ -96,19 +98,18 @@ namespace
     void WriteImageFile(
         const wstring& name,
         const wstring& suffix,
-        uint32_t dimension,
+        INT dimension,
         CLSID& clsid,
-        Gdiplus::Bitmap* bitMap)
+        Bitmap& bitmap)
     {
-        Gdiplus::Bitmap* sqeezed = 
-            new Gdiplus::Bitmap(
+        Bitmap resized{
                 dimension,
                 dimension,
-                PixelFormat32bppARGB);
+                PixelFormat32bppARGB };
 
-        Gdiplus::Graphics* graphic = 
-            Gdiplus::Graphics::FromImage(
-                sqeezed);
+        std::unique_ptr<Graphics> graphic = 
+            std::unique_ptr<Graphics>(new Graphics(&resized));
+
         graphic->SetCompositingQuality(
             Gdiplus::CompositingQuality::CompositingQualityHighQuality);
         graphic->SetInterpolationMode(
@@ -116,7 +117,7 @@ namespace
         graphic->SetSmoothingMode(
             Gdiplus::SmoothingMode::SmoothingModeHighQuality);
         graphic->DrawImage(
-            bitMap,
+            &bitmap,
             0,
             0,
             dimension,
@@ -129,11 +130,9 @@ namespace
             dimension <<
             suffix;
 
-        sqeezed->Save(
+        resized.Save(
             collector.str().c_str(), 
             &clsid);
-
-        delete sqeezed;
     }
 } // unnamed namespace.
 
@@ -147,11 +146,10 @@ void WriteImageSet(const wstring& sourceFile)
     if (!PathFileExistsW(sourceFile.c_str()))
         throw std::invalid_argument("File not found.");
 
-    Gdiplus::Bitmap* bitMap =
-        new Gdiplus::Bitmap(sourceFile.c_str());
+    Gdiplus::Bitmap bitmap{ sourceFile.c_str() };
 
     CLSID fileClsid =
-        GetClsid(bitMap);
+        GetClsid(bitmap);
     if (IsEqualCLSID(fileClsid, CLSID_NULL))
         throw std::invalid_argument("Unknown file type.");
 
@@ -159,11 +157,11 @@ void WriteImageSet(const wstring& sourceFile)
         GetPath(sourceFile);
     wstring suffix =
         GetSuffix(sourceFile);
-    WriteImageFile(baseName, suffix, 16, fileClsid, bitMap);
-    WriteImageFile(baseName, suffix, 32, fileClsid, bitMap);
-    WriteImageFile(baseName, suffix, 64, fileClsid, bitMap);
-    WriteImageFile(baseName, suffix, 128, fileClsid, bitMap);
-    WriteImageFile(baseName, suffix, 256, fileClsid, bitMap);
+    WriteImageFile(baseName, suffix, 16, fileClsid, bitmap);
+    WriteImageFile(baseName, suffix, 32, fileClsid, bitmap);
+    WriteImageFile(baseName, suffix, 64, fileClsid, bitmap);
+    WriteImageFile(baseName, suffix, 128, fileClsid, bitmap);
+    WriteImageFile(baseName, suffix, 256, fileClsid, bitmap);
 }
 
 int wmain(int argc, _TCHAR* argv[])
