@@ -6,11 +6,14 @@
  * LGPL
  */
 
+// Resources
+// https://devblogs.microsoft.com/oldnewthing/20101022-00/?p=12473
+// https://stackoverflow.com/questions/51383896/c-gdibitmap-to-png-image-in-memory
+
 // Use extendedGDI+.
 #define GDIPVER     0x0110
 
 #include <tchar.h>
-//#define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <Gdiplus.h>
 #include "Shlwapi.h"
@@ -28,9 +31,11 @@
 #pragma comment(lib, "gdiplus.lib")
 #pragma comment(lib, "Shlwapi.lib")
 
+using std::wstring;
+
 namespace
 {
-    std::wstring GetSuffix(std::wstring& path)
+    wstring GetSuffix(const wstring& path)
     {
         auto lastIdx = path.find_last_of(L".");
         if (lastIdx == std::wstring::npos)
@@ -39,7 +44,7 @@ namespace
         return path.substr(lastIdx);
     }
 
-    std::wstring GetPath(std::wstring& path)
+    std::wstring GetPath(const wstring& path)
     {
         auto lastIdx = path.find_last_of(L".");
         if (lastIdx == std::wstring::npos)
@@ -127,9 +132,9 @@ namespace
         return CLSID_NULL;
     }
 
-    void writeImageFile(
-        std::wstring name,
-        std::wstring suffix,
+    void WriteImageFile(
+        const wstring& name,
+        const wstring& suffix,
         uint32_t dimension,
         CLSID& clsid,
         Gdiplus::Bitmap* bitMap)
@@ -175,7 +180,12 @@ namespace
 // https://devblogs.microsoft.com/oldnewthing/20101022-00/?p=12473
 // https://stackoverflow.com/questions/51383896/c-gdibitmap-to-png-image-in-memory
 
-int wmain(int argc, _TCHAR* argv[])
+/**
+ * Use the passed image to create a set of scaled, square images in the
+ * dimensions 16, 32, 64, 128, 256.  It is recommended to pass a square
+ * image though all image sizes will do.
+ */
+void WriteImageSet(const wstring& sourceFile)
 {
     using std::wstring;
 
@@ -183,33 +193,38 @@ int wmain(int argc, _TCHAR* argv[])
     ULONG_PTR gdiplustoken;
     Gdiplus::GdiplusStartup(&gdiplustoken, &gdiStartupInput, nullptr);
 
-    std::wstring strfilePath =
-        L"mmt-icon-1024.png";
-    std::wstring strdup =
-        L"mmt-icon-128.png";
-
-    if (! PathFileExistsW(strfilePath.c_str()))
-        // File not found.
-        return 1;
+    if (!PathFileExistsW(sourceFile.c_str()))
+        throw std::invalid_argument("File not found.");
 
     Gdiplus::Bitmap* bitMap =
-        new Gdiplus::Bitmap(strfilePath.c_str());
+        new Gdiplus::Bitmap(sourceFile.c_str());
 
     CLSID fileClsid =
         GetClsid(bitMap);
     if (IsEqualCLSID(fileClsid, CLSID_NULL))
-        // Unknown file type.
-        return 1;
+        throw std::invalid_argument("Unknown file type.");
 
     wstring baseName =
-        GetPath(strfilePath);
+        GetPath(sourceFile);
     wstring suffix =
-        GetSuffix(strfilePath);
-    writeImageFile(baseName, suffix,  16, fileClsid, bitMap);
-    writeImageFile(baseName, suffix,  32, fileClsid, bitMap);
-    writeImageFile(baseName, suffix,  64, fileClsid, bitMap);
-    writeImageFile(baseName, suffix, 128, fileClsid, bitMap);
-    writeImageFile(baseName, suffix, 256, fileClsid, bitMap);
+        GetSuffix(sourceFile);
+    WriteImageFile(baseName, suffix, 16, fileClsid, bitMap);
+    WriteImageFile(baseName, suffix, 32, fileClsid, bitMap);
+    WriteImageFile(baseName, suffix, 64, fileClsid, bitMap);
+    WriteImageFile(baseName, suffix, 128, fileClsid, bitMap);
+    WriteImageFile(baseName, suffix, 256, fileClsid, bitMap);
+}
+
+int wmain(int argc, _TCHAR* argv[])
+{
+    Gdiplus::GdiplusStartupInputEx gdiStartupInput;
+    ULONG_PTR gdiplustoken;
+    Gdiplus::GdiplusStartup(&gdiplustoken, &gdiStartupInput, nullptr);
+
+    std::wstring strfilePath =
+        L"mmt-icon-1024.png";
+
+    WriteImageSet(strfilePath);
 
     Gdiplus::GdiplusShutdown(gdiplustoken);
     return 0;
