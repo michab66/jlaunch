@@ -113,7 +113,7 @@ int APIENTRY micbinzwWinMain(
     };
 
     JavaVMInitArgs vmArgs{
-        JNI_VERSION_10,
+        JNI_VERSION_1_8,
         static_cast<jint>(jvmopt.size()),
         jvmopt.data(),
         JNI_FALSE 
@@ -309,7 +309,7 @@ int wmain(int argc, _TCHAR* argv[])
     std::wstring mimeType = GetMimeType(bitMap);
 
     std::wcout << "micbinz: guid=" << mimeType << std::endl;
-    Gdiplus::GetEncoderClsid
+
     Gdiplus::Bitmap* sqeezed = new Gdiplus::Bitmap(128, 128, PixelFormat32bppRGB);
 
     Gdiplus::Graphics* graphic = Gdiplus::Graphics::FromImage(sqeezed);
