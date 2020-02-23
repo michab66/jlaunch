@@ -21,9 +21,11 @@
 #include <jni.h>
 
 #include <iostream>
+#include <fstream>
 #include <string>
 #include <map>
 #include <sstream>
+#include <vector>
 
 // Get our resource definitions.
 #include "resource.h"
@@ -134,6 +136,59 @@ namespace
             collector.str().c_str(), 
             &clsid);
     }
+
+    std::vector<std::uint8_t> GetImageBinary(
+        INT dimension,
+        CLSID& clsid,
+        Bitmap& bitmap)
+    {
+        Bitmap resized{
+                dimension,
+                dimension,
+                PixelFormat32bppARGB };
+
+        std::unique_ptr<Graphics> graphic =
+            std::unique_ptr<Graphics>(new Graphics(&resized));
+
+        graphic->SetCompositingQuality(
+            Gdiplus::CompositingQuality::CompositingQualityHighQuality);
+        graphic->SetInterpolationMode(
+            Gdiplus::InterpolationMode::InterpolationModeHighQualityBilinear);
+        graphic->SetSmoothingMode(
+            Gdiplus::SmoothingMode::SmoothingModeHighQuality);
+        graphic->DrawImage(
+            &bitmap,
+            0,
+            0,
+            dimension,
+            dimension);
+
+        //write to IStream
+        IStream* istream = nullptr;
+        HRESULT hr = CreateStreamOnHGlobal(NULL, TRUE, &istream);
+
+        resized.Save(
+            istream,
+            &clsid);
+
+        //get memory handle associated with istream
+        HGLOBAL hg = NULL;
+        GetHGlobalFromStream(istream, &hg);
+
+        //copy IStream to buffer
+        size_t bufsize = GlobalSize(hg);
+
+        std::vector<uint8_t> result( bufsize );
+
+        //lock & unlock memory
+        LPVOID pimage = GlobalLock(hg);
+        memcpy(&result[0], pimage, bufsize);
+        GlobalUnlock(hg);
+
+        istream->Release();
+
+        return result;
+    }
 } // unnamed namespace.
 
 /**
@@ -164,6 +219,45 @@ void WriteImageSet(const wstring& sourceFile)
     WriteImageFile(baseName, suffix, 256, fileClsid, bitmap);
 }
 
+/**
+ * Use the passed image to create a set of scaled, square images in the
+ * dimensions 16, 32, 64, 128, 256.  It is recommended to pass a square
+ * image though all image sizes will do.
+ */
+void WriteIconFile(const wstring& sourceFile)
+{
+    if (!PathFileExistsW(sourceFile.c_str()))
+        throw std::invalid_argument("File not found.");
+
+    Gdiplus::Bitmap bitmap{ sourceFile.c_str() };
+
+    CLSID fileClsid =
+        GetClsid(bitmap);
+    if (IsEqualCLSID(fileClsid, CLSID_NULL))
+        throw std::invalid_argument("Unknown file type.");
+
+    wstring baseName =
+        GetPath(sourceFile);
+    wstring suffix =
+        GetSuffix(sourceFile);
+
+    auto scaled = GetImageBinary(16, fileClsid, bitmap);
+
+    std::wcout << L"Size is: " << scaled.size() << std::endl;
+
+    baseName.append(L"-icn");
+    baseName.append(suffix);
+
+    //write from memory to file for testing:
+    std::ofstream fout(
+        baseName.c_str(), 
+        std::ios::binary);
+    fout.write(
+        (char*)scaled.data(), 
+        scaled.size() );
+
+}
+
 int wmain(int argc, _TCHAR* argv[])
 {
     Gdiplus::GdiplusStartupInputEx gdiStartupInput;
@@ -173,7 +267,11 @@ int wmain(int argc, _TCHAR* argv[])
     wstring strfilePath =
         L"mmt-icon-1024.png";
 
+#if 0
     WriteImageSet(strfilePath);
+#else
+    WriteIconFile(strfilePath);
+#endif
 
     Gdiplus::GdiplusShutdown(gdiplustoken);
     return 0;
