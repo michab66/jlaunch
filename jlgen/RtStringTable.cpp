@@ -56,7 +56,7 @@ void mob::windows::RtString::update(HANDLE resourceHolder, int resourceId)
         {
             WORD len = (WORD)c->second.length();
             bang(buffer, sizeof(len), &len);
-            
+            // TODO use new converter from util.
             std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
             wstring wstr = converter.from_bytes(c->second);
             const wchar_t* contents = wstr.c_str();

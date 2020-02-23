@@ -28,6 +28,8 @@
 #include <sstream>
 #include <vector>
 
+#include "winicon.h"
+
 #include "mod_util.hpp"
 #include "mod_icons.hpp"
 
