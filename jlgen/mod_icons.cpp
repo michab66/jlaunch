@@ -108,7 +108,7 @@ namespace
             std::cout <<
                 i <<
                 " : "
-                << c->MimeType
+                << smack::util::convert( c->MimeType )
                 << std::endl;
 
             if (IsEqualCLSID(c->FormatID, raw))
@@ -186,7 +186,7 @@ namespace
         std::ostringstream collector;
         collector <<
             name <<
-            L"-" <<
+            "-" <<
             dimension <<
             suffix;
 
@@ -196,10 +196,11 @@ namespace
         std::ofstream fout(
             targetName,
             std::ios::binary);
-
         fout.write(
             (char*)scaled.data(),
             scaled.size());
+        // Trigger write error here, not in destructor.
+        fout.close();
     }
 } // unnamed namespace.
 
@@ -272,13 +273,14 @@ void WriteIconFile(const string& sourceFile)
     baseName.append("-icn");
     baseName.append(suffix);
 
-    //write from memory to file for testing:
     std::ofstream fout(
         baseName.c_str(), 
         std::ios::binary);
     fout.write(
         (char*)scaled.data(), 
         scaled.size() );
+    // Trigger write error here, not in destructor.
+    fout.close();
 }
 
 }

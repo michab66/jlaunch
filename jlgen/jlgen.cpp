@@ -145,7 +145,9 @@ namespace jlgen
         auto cli = smack::util::makeCliApplication(
             cmd0,
             cmd2,
-            cmd3
+            cmd3,
+            cmd4,
+            cmd5
         );
 
         return cli.launch(argv);
