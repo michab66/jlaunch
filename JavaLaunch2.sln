@@ -3,8 +3,6 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 16
 VisualStudioVersion = 16.0.28803.202
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "JavaLaunch2", "JavaLaunch2.vcxproj", "{31083CAB-1408-466E-B877-3284356C6A3D}"
-EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jlgen", "jlgen\jlgen.vcxproj", "{94BC7B85-1FAD-4580-9AF3-B645C5FB3934}"
 EndProject
 Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "jlaunch", "jlaunch\jlaunch.vcxproj", "{91411589-FC01-43B1-A7E6-8935C1BA5EF8}"
@@ -17,14 +15,6 @@ Global
 		Release|x86 = Release|x86
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{31083CAB-1408-466E-B877-3284356C6A3D}.Debug|x64.ActiveCfg = Debug|x64
-		{31083CAB-1408-466E-B877-3284356C6A3D}.Debug|x64.Build.0 = Debug|x64
-		{31083CAB-1408-466E-B877-3284356C6A3D}.Debug|x86.ActiveCfg = Debug|Win32
-		{31083CAB-1408-466E-B877-3284356C6A3D}.Debug|x86.Build.0 = Debug|Win32
-		{31083CAB-1408-466E-B877-3284356C6A3D}.Release|x64.ActiveCfg = Release|x64
-		{31083CAB-1408-466E-B877-3284356C6A3D}.Release|x64.Build.0 = Release|x64
-		{31083CAB-1408-466E-B877-3284356C6A3D}.Release|x86.ActiveCfg = Release|Win32
-		{31083CAB-1408-466E-B877-3284356C6A3D}.Release|x86.Build.0 = Release|Win32
 		{94BC7B85-1FAD-4580-9AF3-B645C5FB3934}.Debug|x64.ActiveCfg = Debug|x64
 		{94BC7B85-1FAD-4580-9AF3-B645C5FB3934}.Debug|x64.Build.0 = Debug|x64
 		{94BC7B85-1FAD-4580-9AF3-B645C5FB3934}.Debug|x86.ActiveCfg = Debug|Win32
