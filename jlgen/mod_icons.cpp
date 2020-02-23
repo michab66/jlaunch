@@ -203,6 +203,10 @@ namespace
     }
 } // unnamed namespace.
 
+namespace smack {
+namespace util {
+namespace icons {
+
 /**
  * Use the passed image to create a set of scaled, square images in the
  * dimensions 16, 32, 64, 128, 256.  It is recommended to pass a square
@@ -237,9 +241,7 @@ void WriteImageSet(const string& sourceFile)
 }
 
 /**
- * Use the passed image to create a set of scaled, square images in the
- * dimensions 16, 32, 64, 128, 256.  It is recommended to pass a square
- * image though all image sizes will do.
+ * Use the passed image to create an icon file.
  */
 void WriteIconFile(const string& sourceFile)
 {
@@ -277,4 +279,8 @@ void WriteIconFile(const string& sourceFile)
     fout.write(
         (char*)scaled.data(), 
         scaled.size() );
+}
+
+}
+}
 }
