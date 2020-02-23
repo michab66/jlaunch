@@ -163,6 +163,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="mod_icons.hpp" />
+    <ClInclude Include="mod_util.hpp" />
     <ClInclude Include="resource.h" />
     <ClInclude Include="RtBase.h" />
     <ClInclude Include="RtIcon.h" />

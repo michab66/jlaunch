@@ -10,6 +10,9 @@
 // https://devblogs.microsoft.com/oldnewthing/20101022-00/?p=12473
 // https://stackoverflow.com/questions/51383896/c-gdibitmap-to-png-image-in-memory
 
+// See https://docs.microsoft.com/en-us/windows/uwp/design/globalizing/use-utf8-code-page
+#undef UNICODE
+
 // Use extendedGDI+.
 #define GDIPVER     0x0110
 
@@ -25,12 +28,13 @@
 #include <sstream>
 #include <vector>
 
+#include "mod_util.hpp"
 #include "mod_icons.hpp"
 
 #pragma comment(lib, "gdiplus.lib")
 #pragma comment(lib, "Shlwapi.lib")
 
-using std::wstring;
+using std::string;
 using Gdiplus::Graphics;
 using Gdiplus::Bitmap;
 
@@ -38,8 +42,8 @@ namespace
 {
     class InitGdiPlus
     {
-        Gdiplus::GdiplusStartupInputEx gdiStartupInput_;
-        ULONG_PTR gdiplustoken_;
+        Gdiplus::GdiplusStartupInputEx gdiStartupInput_{};
+        ULONG_PTR gdiplustoken_{};
 
     public:
         InitGdiPlus()
@@ -56,20 +60,20 @@ namespace
         }
     };
 
-    wstring GetSuffix(const wstring& path)
+    string GetSuffix(const string& path)
     {
-        auto lastIdx = path.find_last_of(L".");
-        if (lastIdx == wstring::npos)
-            return wstring{};
+        auto lastIdx = path.find_last_of(".");
+        if (lastIdx == string::npos)
+            return string{};
 
         return path.substr(lastIdx);
     }
 
-    wstring GetPath(const wstring& path)
+    string GetPath(const string& path)
     {
-        auto lastIdx = path.find_last_of(L".");
-        if (lastIdx == wstring::npos)
-            return wstring{};
+        auto lastIdx = path.find_last_of(".");
+        if (lastIdx == string::npos)
+            return string{};
 
         return path.substr(0,lastIdx);
     }
@@ -101,7 +105,7 @@ namespace
             Gdiplus::ImageCodecInfo* c =
                 &tbuffer[i];
 
-            std::wcout <<
+            std::cout <<
                 i <<
                 " : "
                 << c->MimeType
@@ -112,46 +116,6 @@ namespace
         }
 
         return CLSID_NULL;
-    }
-
-    void WriteImageFile(
-        const wstring& name,
-        const wstring& suffix,
-        INT dimension,
-        CLSID& clsid,
-        Bitmap& bitmap)
-    {
-        Bitmap resized{
-                dimension,
-                dimension,
-                PixelFormat32bppARGB };
-
-        std::unique_ptr<Graphics> graphic = 
-            std::unique_ptr<Graphics>(new Graphics(&resized));
-
-        graphic->SetCompositingQuality(
-            Gdiplus::CompositingQuality::CompositingQualityHighQuality);
-        graphic->SetInterpolationMode(
-            Gdiplus::InterpolationMode::InterpolationModeHighQualityBilinear);
-        graphic->SetSmoothingMode(
-            Gdiplus::SmoothingMode::SmoothingModeHighQuality);
-        graphic->DrawImage(
-            &bitmap,
-            0,
-            0,
-            dimension,
-            dimension);
-
-        std::wostringstream collector;
-        collector <<
-            name <<
-            L"-" <<
-            dimension <<
-            suffix;
-
-        resized.Save(
-            collector.str().c_str(), 
-            &clsid);
     }
 
     std::vector<std::uint8_t> GetImageBinary(
@@ -206,6 +170,37 @@ namespace
 
         return result;
     }
+
+    void WriteImageFile(
+        const string& name,
+        const string& suffix,
+        INT dimension,
+        CLSID& clsid,
+        Bitmap& bitmap)
+    {
+        auto scaled = GetImageBinary(
+            dimension,
+            clsid,
+            bitmap);
+
+        std::ostringstream collector;
+        collector <<
+            name <<
+            L"-" <<
+            dimension <<
+            suffix;
+
+        string targetName = collector.str();
+
+        // Write to file.
+        std::ofstream fout(
+            targetName,
+            std::ios::binary);
+
+        fout.write(
+            (char*)scaled.data(),
+            scaled.size());
+    }
 } // unnamed namespace.
 
 /**
@@ -213,23 +208,26 @@ namespace
  * dimensions 16, 32, 64, 128, 256.  It is recommended to pass a square
  * image though all image sizes will do.
  */
-void WriteImageSet(const wstring& sourceFile)
+void WriteImageSet(const string& sourceFile)
 {
     InitGdiPlus init;
 
-    if (!PathFileExistsW(sourceFile.c_str()))
+    if (!PathFileExistsA(sourceFile.c_str()))
         throw std::invalid_argument("File not found.");
 
-    Gdiplus::Bitmap bitmap{ sourceFile.c_str() };
+    std::wstring wideName = 
+        smack::util::convert(sourceFile);
+
+    Gdiplus::Bitmap bitmap{ wideName.c_str() };
 
     CLSID fileClsid =
         GetClsid(bitmap);
     if (IsEqualCLSID(fileClsid, CLSID_NULL))
         throw std::invalid_argument("Unknown file type.");
 
-    wstring baseName =
+    string baseName =
         GetPath(sourceFile);
-    wstring suffix =
+    string suffix =
         GetSuffix(sourceFile);
     WriteImageFile(baseName, suffix, 16, fileClsid, bitmap);
     WriteImageFile(baseName, suffix, 32, fileClsid, bitmap);
@@ -243,30 +241,33 @@ void WriteImageSet(const wstring& sourceFile)
  * dimensions 16, 32, 64, 128, 256.  It is recommended to pass a square
  * image though all image sizes will do.
  */
-void WriteIconFile(const wstring& sourceFile)
+void WriteIconFile(const string& sourceFile)
 {
     InitGdiPlus init;
 
-    if (!PathFileExistsW(sourceFile.c_str()))
+    if (!PathFileExistsA(sourceFile.c_str()))
         throw std::invalid_argument("File not found.");
 
-    Gdiplus::Bitmap bitmap{ sourceFile.c_str() };
+    std::wstring wideName =
+        smack::util::convert(sourceFile);
+
+    Gdiplus::Bitmap bitmap{ wideName.c_str() };
 
     CLSID fileClsid =
         GetClsid(bitmap);
     if (IsEqualCLSID(fileClsid, CLSID_NULL))
         throw std::invalid_argument("Unknown file type.");
 
-    wstring baseName =
+    string baseName =
         GetPath(sourceFile);
-    wstring suffix =
+    string suffix =
         GetSuffix(sourceFile);
 
     auto scaled = GetImageBinary(16, fileClsid, bitmap);
 
-    std::wcout << L"Size is: " << scaled.size() << std::endl;
+    std::cout << "Size is: " << scaled.size() << std::endl;
 
-    baseName.append(L"-icn");
+    baseName.append("-icn");
     baseName.append(suffix);
 
     //write from memory to file for testing:
@@ -276,24 +277,4 @@ void WriteIconFile(const wstring& sourceFile)
     fout.write(
         (char*)scaled.data(), 
         scaled.size() );
-
-}
-
-int unused_micbinz_remove(int argc, _TCHAR* argv[])
-{
-    Gdiplus::GdiplusStartupInputEx gdiStartupInput;
-    ULONG_PTR gdiplustoken;
-    Gdiplus::GdiplusStartup(&gdiplustoken, &gdiStartupInput, nullptr);
-
-    wstring strfilePath =
-        L"mmt-icon-1024.png";
-
-#if 0
-    WriteImageSet(strfilePath);
-#else
-    WriteIconFile(strfilePath);
-#endif
-
-    Gdiplus::GdiplusShutdown(gdiplustoken);
-    return 0;
 }

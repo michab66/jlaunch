@@ -74,6 +74,9 @@
     <ClInclude Include="mod_icons.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
+    <ClInclude Include="mod_util.hpp">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="..\x64\Release\jlaunch.exe">
