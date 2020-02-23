@@ -2,6 +2,7 @@
  * Copyright Microsoft
  *
  * See https://devblogs.microsoft.com/oldnewthing/20120720-00/?p=7083
+ * See https://devblogs.microsoft.com/oldnewthing/20101022-00/?p=12473
  */
 
 #define WIN32_LEAN_AND_MEAN
