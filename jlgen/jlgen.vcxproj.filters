@@ -39,6 +39,9 @@
     <ClCompile Include="RtStringTable.cpp">
       <Filter>Quelldateien</Filter>
     </ClCompile>
+    <ClCompile Include="mod_icons.cpp">
+      <Filter>Quelldateien</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ResourceMgr.h">
@@ -66,6 +69,9 @@
       <Filter>Headerdateien</Filter>
     </ClInclude>
     <ClInclude Include="RtStringTable.h">
+      <Filter>Headerdateien</Filter>
+    </ClInclude>
+    <ClInclude Include="mod_icons.hpp">
       <Filter>Headerdateien</Filter>
     </ClInclude>
   </ItemGroup>
