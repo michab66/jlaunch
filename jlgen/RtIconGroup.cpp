@@ -129,9 +129,6 @@ RtIconGroup::RtIconGroup(std::string iconFile)
     if (hFile == INVALID_HANDLE_VALUE)
         throw std::invalid_argument("Load file error!");
 
-    // We need an ICONDIR to hold the data
-    PICONDIR pIconDir = (PICONDIR)malloc(sizeof(ICONDIR));
-
     DWORD dwBytesRead;
 
     // Read the Reserved word
@@ -143,8 +140,10 @@ RtIconGroup::RtIconGroup(std::string iconFile)
     // Read the count - how many images in this file?
     WORD tmpIdCount;
     ReadFile(hFile, &tmpIdCount, sizeof(WORD), &dwBytesRead, NULL);
+
+    // We need an ICONDIR to hold the data
     // Allocate IconDir so that idEntries has enough room for idCount elements
-    pIconDir = (PICONDIR)malloc(
+    PICONDIR pIconDir = (PICONDIR)malloc(
         sizeof(ICONDIR) + ((tmpIdCount - 1) * sizeof(ICONDIRENTRY)));
     pIconDir->idReserved = 0;
     pIconDir->idType = tmpIdType;

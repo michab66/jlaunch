@@ -131,7 +131,7 @@ namespace
                 PixelFormat32bppARGB };
 
         std::unique_ptr<Graphics> graphic =
-            std::unique_ptr<Graphics>(new Graphics(&resized));
+            std::unique_ptr<Graphics>(Graphics::FromImage(&resized));
 
         graphic->SetCompositingQuality(
             Gdiplus::CompositingQuality::CompositingQualityHighQuality);
