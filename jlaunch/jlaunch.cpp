@@ -1,9 +1,7 @@
 /*
- * Simplest Java Launcher.
+ * Java Launcher.
  *
- * Copyright (c) 2019 Michael G. Binz
- *
- * LGPL
+ * Copyright (c) 2020 Michael G. Binz
  */
 
 #include <array>
@@ -19,7 +17,23 @@
  // Get our resource definitions.
 #include "resource.h"
 
-static int dieWithMessage(const TCHAR* msg)
+// Pick a supported Java version
+#if defined JNI_VERSION_10
+#define JNI_VERSION JNI_VERSION_10
+#elif defined JNI_VERSION_9
+#define JNI_VERSION JNI_VERSION_9
+#elif defined JNI_VERSION_1_8
+#define JNI_VERSION JNI_VERSION_1_8
+#else
+#error No supported JNI_VERSION found.
+#endif
+
+using std::string;
+
+namespace
+{
+
+int dieWithMessage(const TCHAR* msg)
 {
     TCHAR szExeFileName[MAX_PATH];
     GetModuleFileName(NULL, szExeFileName, MAX_PATH);
@@ -37,7 +51,7 @@ static int dieWithMessage(const TCHAR* msg)
  * @return The resource string converted to 8bit platform encoding. The
  * string is empty if the resource was not found.
  */
-static std::string getStringResource(HINSTANCE instance, UINT id)
+string getStringResource(HINSTANCE instance, UINT id)
 {
     WCHAR* notUsed{};
 
@@ -51,7 +65,7 @@ static std::string getStringResource(HINSTANCE instance, UINT id)
         0);
 
     // Create our result string in the required size.
-    std::string result(rcw, '\0');
+    string result(rcw, '\0');
 
     // LoadStringA gets the actual result converted into the
     // 8bit platform encoding.
@@ -70,8 +84,10 @@ static std::string getStringResource(HINSTANCE instance, UINT id)
         GetLastError();
 
     // Return the empty string in case of an error.
-    return std::string{};
+    return string{};
 }
+
+} // namespace
 
 /*
  * Windows entry point.
@@ -86,7 +102,7 @@ int APIENTRY wWinMain(
     UNREFERENCED_PARAMETER(lpCmdLine);
     UNREFERENCED_PARAMETER(nCmdShow);
 
-    std::string mainModule = getStringResource(
+    string mainModule = getStringResource(
         hInstance,
         IDS_JAVA_MAIN_MODULE);
 
@@ -97,7 +113,7 @@ int APIENTRY wWinMain(
         "--add-modules=" +
         mainModule;
 
-    std::string mainClassName = getStringResource(
+    string mainClassName = getStringResource(
         hInstance,
         IDS_JAVA_MAIN_CLASS);
     if (mainClassName.empty())
@@ -109,7 +125,7 @@ int APIENTRY wWinMain(
     };
 
     JavaVMInitArgs vmArgs{
-        JNI_VERSION_10,
+        JNI_VERSION,
         static_cast<jint>(jvmopt.size()),
         jvmopt.data(),
         JNI_FALSE
@@ -125,33 +141,6 @@ int APIENTRY wWinMain(
     if (rc == JNI_ERR) {
         return dieWithMessage(_T("Error creating VM\n. Exiting ..."));
     }
-
-    // TODO(michab) Decide if we keep this.
-    // Reads a system property.
-    //jclass jcls = env->FindClass("java/lang/System");
-    //if (jcls == NULL) {
-    //    env->ExceptionDescribe();
-    //    javaVM->DestroyJavaVM();
-    //    return 1;
-    //}
-    //if (jcls != NULL) {
-    //    jmethodID methodId = env->GetStaticMethodID(
-    //        jcls,
-    //        "getProperty",
-    //        "(Ljava/lang/String;)Ljava/lang/String;");
-    //    if (methodId != NULL) {
-    //        jstring str = env->NewStringUTF("java.home");
-    //        jstring got = (jstring) env->CallStaticObjectMethod(jcls, methodId, str);
-    //        if (env->ExceptionCheck()) {
-    //            env->ExceptionDescribe();
-    //            env->ExceptionClear();
-    //        }
-    //        const char* cstr = env->GetStringUTFChars(got, 0);
-    //        std::cout << cstr << std::endl;
-    //        env->ReleaseStringUTFChars(got, cstr);
-    //        env->DeleteLocalRef(got);        
-    //    }
-    //}
 
     jclass stringClass =
         env->FindClass("java/lang/String");
