@@ -25,6 +25,9 @@
 
 namespace jlgen
 {
+    /**
+     * Update the icon with the given id in the executable.
+     */
     int UpdateIcon(
         std::string exeFile,
         int resId,

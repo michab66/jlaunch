@@ -14,7 +14,7 @@ namespace mob
 namespace windows
 {
 
-RtIcon::RtIcon(HANDLE file, PICONDIRENTRY entry)
+RtIcon::RtIcon(HANDLE file, DWORD offset, PGRPICONDIRENTRY entry)
 {
     // Allocate memory to hold the image
     iconData_ = malloc(
@@ -22,7 +22,7 @@ RtIcon::RtIcon(HANDLE file, PICONDIRENTRY entry)
     // Seek to the location in the file that has the image
     SetFilePointer(
         file, 
-        entry->dwImageOffset,
+        offset,
         NULL, 
         FILE_BEGIN);
 
@@ -34,10 +34,15 @@ RtIcon::RtIcon(HANDLE file, PICONDIRENTRY entry)
         &dataSize_, 
         NULL);
     // Result check TODO
+
+    directoryEntry_ =
+        *entry;
 }
 
-RtIcon::RtIcon(int id, HMODULE module)
+RtIcon::RtIcon(PGRPICONDIRENTRY dirEntry, HMODULE module)
 {
+    auto id = 
+        dirEntry->nId;
     // Locate the resource in the .EXE file.
     HRSRC hRes = FindResource(
         module, 
@@ -61,6 +66,27 @@ RtIcon::RtIcon(int id, HMODULE module)
         SizeofResource(module, hRes);
     iconData_ = malloc(resourceSize);
     memcpy(iconData_, dir, resourceSize);
+
+    directoryEntry_ = *dirEntry;
+}
+
+RtIcon::RtIcon(BYTE w, BYTE h, WORD bpp, std::vector<std::uint8_t> png)
+{
+    dataSize_ =
+        static_cast<DWORD>(png.size());
+    iconData_ = malloc(dataSize_);
+    if (iconData_ == nullptr)
+        throw new std::bad_alloc();
+    directoryEntry_.bWidth =
+        w;
+    directoryEntry_.bWidth =
+        h;
+    directoryEntry_.wPlanes =
+        1;
+    directoryEntry_.wBitCount =
+        32;
+    directoryEntry_.dwBytesInRes =
+        dataSize_;
 }
 
 RtIcon::~RtIcon()

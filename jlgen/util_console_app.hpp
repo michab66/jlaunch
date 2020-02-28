@@ -95,10 +95,15 @@ class CliApplication
 {
     std::tuple<Cs...> commands_;
 
+    bool found_;
+
     template <size_t I>
     typename std::enable_if<I == sizeof...(Cs), int>::type
     find(const string& name, const std::vector<string>&) {
-        std::cerr << "Unknown command '" << name << "'." << endl;
+        if ( found_ )
+            std::cerr << "Wrong number of parameters for command '" << name << "'." << endl;
+        else
+            std::cerr << "Unknown command '" << name << "'." << endl;
         return EXIT_FAILURE;
     }
     template <size_t I>
@@ -107,6 +112,9 @@ class CliApplication
         auto c = std::get<I>(commands_);
         if (name == c.get_name() && argv.size() == c.kParameterCount)
             return c(argv);
+        else if (name == c.get_name()) {
+            found_ = true;
+        }
         return find<I + 1>(name, argv);
     }
 

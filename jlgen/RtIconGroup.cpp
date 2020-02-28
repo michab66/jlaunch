@@ -6,6 +6,8 @@
 
 #include <iostream>
 #include <stdexcept>
+#include <vector>
+
 #include "RtIconGroup.h"
 
 static void dump(int idx, PICONDIRENTRY iconDirEntry)
@@ -75,6 +77,18 @@ static void dump(PGRPICONDIR iconDirEntry)
         dump(i, &iconDirEntry->idEntries[i]);
 }
 
+namespace
+{
+    template<typename T>
+    void bang(std::vector<uint8_t>& v, size_t size, const T* value)
+    {
+        uint8_t* pointer = (uint8_t*)value;
+
+        for (int i = 0; i < size; ++i)
+            v.push_back(pointer[i]);
+    }
+}
+
 namespace mob
 {
 namespace windows
@@ -110,7 +124,7 @@ RtIconGroup::RtIconGroup(int id, std::string executableName)
 
     for (int i = 0; i < dir_->idCount; ++i)
     {
-        RtIcon* c = new RtIcon(dir_->idEntries[i].nId, hExe);
+        RtIcon* c = new RtIcon(&dir_->idEntries[i], hExe);
         icons_.push_back(c);
     }
 }
@@ -184,7 +198,10 @@ RtIconGroup::RtIconGroup(std::string iconFile)
     // Loop through and read in each image
     for (WORD i = 0; i < pIconDir->idCount; i++)
     {
-        RtIcon* c = new RtIcon{ hFile, &pIconDir->idEntries[i] };
+        RtIcon* c = new RtIcon{ 
+            hFile,
+            pIconDir->idEntries[i].dwImageOffset,
+            &dir_->idEntries[i] };
         icons_.push_back(c);
     }
 }
@@ -213,13 +230,30 @@ DWORD RtIconGroup::sizeofGroup()
 
 void RtIconGroup::update(HANDLE resourceHolder, int resourceId)
 {
+    std::vector<uint8_t> data;
+
+    GRPICONDIR dir{ 0, 1, static_cast<WORD>(icons_.size()) };
+
+    bang(
+        data,
+        sizeof( dir) - sizeof(dir.idEntries),
+        &dir );
+
+    for (auto& c : icons_)
+    {
+        auto dirEntry = c->GetDirectoryEntry();
+        bang(data, sizeof(dirEntry), &dirEntry);
+    }
+
     BOOL result = UpdateResource(
-        resourceHolder,    // update resource handle
-        RT_GROUP_ICON,                         // change dialog box resource
-        MAKEINTRESOURCE(resourceId),         // dialog box id
-        MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),  // neutral language
-        dir_,                         // ptr to resource info
-        sizeofGroup());       // size of resource info
+        resourceHolder,
+        RT_GROUP_ICON,
+        MAKEINTRESOURCE(resourceId),
+        MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),
+        // Resource data.
+        &data[0],
+        // Resource size.
+        static_cast<DWORD>(data.size()));
 
     if (!result)
         throw std::invalid_argument("Update failed.");

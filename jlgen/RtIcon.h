@@ -20,15 +20,31 @@ namespace windows
      */
     class RtIcon : RtBase
     {
+        GRPICONDIRENTRY directoryEntry_{};
         DWORD dataSize_ = 0;
         LPVOID iconData_ = 0;
 
     public:
-        RtIcon(HANDLE file, PICONDIRENTRY entry);
-        RtIcon(int id, HMODULE module);
+        RtIcon(
+            HANDLE file, 
+            DWORD offset,
+            PGRPICONDIRENTRY entry);
+        RtIcon(
+            PGRPICONDIRENTRY dirEntry, 
+            HMODULE module);
+        RtIcon(
+            BYTE w,
+            BYTE h,
+            WORD bpp,
+            std::vector<std::uint8_t> png);
         ~RtIcon();
 
         void update(HANDLE resourceHolder, int resourceId);
+
+        GRPICONDIRENTRY GetDirectoryEntry()
+        {
+            return directoryEntry_;
+        }
     };
 
 } // namespace windows
