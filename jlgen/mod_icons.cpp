@@ -32,13 +32,16 @@
 
 #include "mod_util.hpp"
 #include "mod_icons.hpp"
+#include "RtIcon.h"
 
 #pragma comment(lib, "gdiplus.lib")
 #pragma comment(lib, "Shlwapi.lib")
 
 using std::string;
+using std::vector;
 using Gdiplus::Graphics;
 using Gdiplus::Bitmap;
+using mob::windows::RtIcon;
 
 namespace
 {
@@ -283,6 +286,47 @@ void WriteIconFile(const string& sourceFile)
         scaled.size() );
     // Trigger write error here, not in destructor.
     fout.close();
+}
+
+/**
+ *
+ */
+vector<std::unique_ptr<RtIcon>> CreateIcons(
+    size_t count,
+    const string& sourcePng)
+{
+    if (!PathFileExistsA(sourcePng.c_str()))
+        throw std::invalid_argument("File not found.");
+
+    InitGdiPlus init;
+
+    std::wstring wideName =
+        smack::util::convert(sourcePng);
+
+    Gdiplus::Bitmap bitmap{ wideName.c_str() };
+
+    CLSID fileClsid =
+        GetClsid(bitmap);
+    if (IsEqualCLSID(fileClsid, CLSID_NULL))
+        throw std::invalid_argument("Unknown file type.");
+
+    uint8_t minimumDimension = 16;
+
+    vector<std::unique_ptr<RtIcon>> result;
+
+    for (size_t i = 0; i < count; ++i)
+    {
+        auto dimension =
+            minimumDimension << i;
+        auto binary =
+            GetImageBinary(dimension, fileClsid, bitmap);
+
+        std::unique_ptr<RtIcon> icon =
+            std::unique_ptr<RtIcon>(new RtIcon(dimension, dimension, 32, binary));
+
+        result.push_back(std::move(icon));
+    }
+    return result;
 }
 
 }

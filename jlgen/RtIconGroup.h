@@ -23,15 +23,9 @@ namespace windows
     {
         RtIconGroup(RtIconGroup const&) = delete;
 
-        // malloced
-        PGRPICONDIR dir_;
-
         std::vector<RtIcon*> icons_;
 
-        RtIconGroup() :
-            dir_(nullptr) {};
-
-        void Dump(int idx, PGRPICONDIRENTRY iconDirEntry);
+        void Dump(size_t idx, PGRPICONDIRENTRY iconDirEntry);
 
         DWORD sizeofGroup();
 
@@ -46,4 +40,4 @@ namespace windows
     };
 
 } // namespace windows
-} // namespace micbinz
+} // namespace mob

@@ -119,7 +119,7 @@ RtIconGroup::RtIconGroup(int id, std::string executableName)
     // Perform a copy to be in-line with the icon file reader.
     int resourceSize = 
         SizeofResource(hExe, hRes);
-    dir_ = (PGRPICONDIR)malloc(resourceSize);
+    auto dir_ = (PGRPICONDIR)malloc(resourceSize);
     memcpy(dir_, dir, resourceSize);
 
     for (int i = 0; i < dir_->idCount; ++i)
@@ -174,7 +174,7 @@ RtIconGroup::RtIconGroup(std::string iconFile)
 
     // Convert.
 
-    dir_ =
+    auto dir_ =
         (PGRPICONDIR)malloc(sizeof(GRPICONDIR) + ((pIconDir->idCount - 1) * sizeof(GRPICONDIRENTRY)));
     dir_->idReserved = pIconDir->idReserved;
     dir_->idCount = pIconDir->idCount;
@@ -208,8 +208,6 @@ RtIconGroup::RtIconGroup(std::string iconFile)
 
 RtIconGroup::~RtIconGroup()
 {
-    free(dir_);
-
     for (int i = 0; i < icons_.size(); ++i)
     {
         RtIcon* c = icons_[i];
@@ -220,12 +218,12 @@ RtIconGroup::~RtIconGroup()
 
 DWORD RtIconGroup::sizeofGroup()
 {
-    DWORD result =
+    auto result =
         sizeof(GRPICONDIR);
     result +=
-        (dir_->idCount - 1) *
+        (icons_.size() - 1) *
         sizeof(GRPICONDIRENTRY);
-    return result;
+    return static_cast<DWORD>(result);
 }
 
 void RtIconGroup::update(HANDLE resourceHolder, int resourceId)
@@ -265,28 +263,15 @@ void RtIconGroup::update(HANDLE resourceHolder, int resourceId)
 
 void RtIconGroup::Dump()
 {
-    if (dir_->idReserved != 0 || dir_->idType != 1)
+    size_t idx = 0;
+    for (auto& c : icons_)
     {
-        std::cout <<
-            "Not an ICONDIR. idReserved= " <<
-            dir_->idReserved <<
-            ", idType=" <<
-            dir_->idType <<
-            std::endl;
-        return;
+        auto dirEntry = c->GetDirectoryEntry();
+        Dump(idx++, &dirEntry);
     }
-
-    std::cout <<
-        "ICONDIR contains " <<
-        dir_->idCount <<
-        " icons." <<
-        std::endl;
-
-    for (int i = 0; i < dir_->idCount; ++i)
-        Dump(i, &dir_->idEntries[i]);
 }
 
-void RtIconGroup::Dump(int idx, PGRPICONDIRENTRY iconDirEntry)
+void RtIconGroup::Dump(size_t idx, PGRPICONDIRENTRY iconDirEntry)
 {
     std::cout << "ICONDIRENTRY[" << idx << "] " <<
         " w=" << (int)iconDirEntry->bWidth <<

@@ -10,6 +10,8 @@
 
 #include <string>
 
+#include "RtIcon.h"
+
 namespace smack {
 namespace util {
 namespace icons {
@@ -28,6 +30,12 @@ void WriteImageSet(const std::string& sourceFile);
     */
 void WriteIconFile(const std::string& sourceFile);
 
+/**
+ *
+ */
+std::vector<std::unique_ptr<mob::windows::RtIcon>> CreateIcons(
+    size_t count,
+    const std::string& sourcePng);
 }
 }
 }
