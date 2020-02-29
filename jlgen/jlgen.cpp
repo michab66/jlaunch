@@ -52,6 +52,8 @@ namespace jlgen
 
     /**
      * Update the icon with the given id in the executable.
+     *
+     * UpdateIcon C:\Users\Michael\svn\rep_github\jlaunch\x64\Debug\jlaunch.exe ..\mmt-icon-1024.png
      */
     int UpdateIcon2(
         std::string exeFile,
