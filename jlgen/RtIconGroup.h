@@ -30,9 +30,15 @@ namespace windows
         DWORD sizeofGroup();
 
     public:
+        RtIconGroup() {};
         RtIconGroup(std::string iconFile);
         RtIconGroup(int resourceId, std::string exeName);
         ~RtIconGroup();
+
+        void Add(RtIcon* icon)
+        {
+            icons_.push_back(icon);
+        }
 
         void update(HANDLE resourceHolder, int resourceId);
 

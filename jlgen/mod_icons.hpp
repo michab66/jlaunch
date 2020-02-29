@@ -33,9 +33,11 @@ void WriteIconFile(const std::string& sourceFile);
 /**
  *
  */
-std::vector<std::unique_ptr<mob::windows::RtIcon>> CreateIcons(
+void CreateIcons(
+    std::vector<std::unique_ptr<mob::windows::RtIcon>>& outHolder,
     size_t count,
     const std::string& sourcePng);
+
 }
 }
 }

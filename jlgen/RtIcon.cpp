@@ -77,6 +77,7 @@ RtIcon::RtIcon(BYTE w, BYTE h, WORD bpp, std::vector<std::uint8_t> png)
     iconData_ = malloc(dataSize_);
     if (iconData_ == nullptr)
         throw new std::bad_alloc();
+    memcpy(iconData_, &png[0], dataSize_);
     directoryEntry_.bWidth =
         w;
     directoryEntry_.bWidth =

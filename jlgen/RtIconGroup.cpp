@@ -208,12 +208,6 @@ RtIconGroup::RtIconGroup(std::string iconFile)
 
 RtIconGroup::~RtIconGroup()
 {
-    for (int i = 0; i < icons_.size(); ++i)
-    {
-        RtIcon* c = icons_[i];
-        delete c;
-    }
-    icons_.clear();
 }
 
 DWORD RtIconGroup::sizeofGroup()
@@ -237,10 +231,17 @@ void RtIconGroup::update(HANDLE resourceHolder, int resourceId)
         sizeof( dir) - sizeof(dir.idEntries),
         &dir );
 
+    int idCounter = 0;
     for (auto& c : icons_)
     {
-        auto dirEntry = c->GetDirectoryEntry();
-        bang(data, sizeof(dirEntry), &dirEntry);
+        auto dirEntry =
+            c->GetDirectoryEntry();
+        dirEntry.nId = 
+            ++idCounter;
+        bang(
+            data,
+            sizeof(dirEntry),
+            &dirEntry);
     }
 
     BOOL result = UpdateResource(

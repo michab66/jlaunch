@@ -291,7 +291,8 @@ void WriteIconFile(const string& sourceFile)
 /**
  *
  */
-vector<std::unique_ptr<RtIcon>> CreateIcons(
+void CreateIcons(
+    vector<std::unique_ptr<RtIcon>>& outHolder,
     size_t count,
     const string& sourcePng)
 {
@@ -312,21 +313,17 @@ vector<std::unique_ptr<RtIcon>> CreateIcons(
 
     uint8_t minimumDimension = 16;
 
-    vector<std::unique_ptr<RtIcon>> result;
-
     for (size_t i = 0; i < count; ++i)
     {
         auto dimension =
             minimumDimension << i;
         auto binary =
             GetImageBinary(dimension, fileClsid, bitmap);
-
-        std::unique_ptr<RtIcon> icon =
+        auto icon =
             std::unique_ptr<RtIcon>(new RtIcon(dimension, dimension, 32, binary));
 
-        result.push_back(std::move(icon));
+        outHolder.push_back(std::move(icon));
     }
-    return result;
 }
 
 }

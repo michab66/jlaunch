@@ -8,8 +8,10 @@
 #undef UNICODE
 
 #include <cstdio>
-#include <string>
 #include <iostream>
+#include <memory>
+#include <string>
+#include <vector>
 
 #include "util_console_app.hpp"
 
@@ -27,6 +29,8 @@ namespace jlgen
 {
     /**
      * Update the icon with the given id in the executable.
+     *
+     * UpdateIcon C:\Users\Michael\svn\rep_github\jlaunch\x64\Debug\jlaunch.exe 1 ..\MMT.ico
      */
     int UpdateIcon(
         std::string exeFile,
@@ -41,6 +45,38 @@ namespace jlgen
 
         target.addIcon(resId, icon);
 
+        target.commit();
+
+        return 0;
+    }
+
+    /**
+     * Update the icon with the given id in the executable.
+     */
+    int UpdateIcon2(
+        std::string exeFile,
+        std::string iconFile)
+    {
+        using mob::windows::RtIconGroup;
+        using mob::windows::RtIcon;
+
+        std::vector<std::unique_ptr<RtIcon>> outHolder;
+        // Icons sizes 16, 32, 64, 128.
+        smack::util::icons::CreateIcons(outHolder, 4, iconFile);
+
+        mob::ResourceMgr target{ exeFile };
+
+        RtIconGroup iconGroup;
+
+        for (size_t i = 0; i < outHolder.size(); ++i)
+        {
+            std::unique_ptr<RtIcon>& a
+                = outHolder[i];
+
+            iconGroup.Add(a.get());
+        }
+
+        target.addIcon(1, iconGroup);
         target.commit();
 
         return 0;
@@ -144,13 +180,17 @@ namespace jlgen
         auto cmd5 = Commands<string>::make(
             "WriteIconFile",
             WriteIconFile);
+        auto cmd6 = Commands<string,string>::make(
+            "UpdateIcon",
+            UpdateIcon2);
 
         auto cli = smack::util::makeCliApplication(
             cmd0,
             cmd2,
             cmd3,
             cmd4,
-            cmd5
+            cmd5,
+            cmd6
         );
 
         return cli.launch(argv);
