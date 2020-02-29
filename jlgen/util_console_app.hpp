@@ -99,11 +99,22 @@ class CliApplication
 
     template <size_t I>
     typename std::enable_if<I == sizeof...(Cs), int>::type
-    find(const string& name, const std::vector<string>&) {
-        if ( found_ )
-            std::cerr << "Wrong number of parameters for command '" << name << "'." << endl;
+    find(const string& name, const std::vector<string>& argv) {
+        if (found_) {
+            cerr << 
+                "Command '" <<
+                name <<
+                "' does not support " <<
+                std::to_string( argv.size() ) <<
+                " parameters." <<
+                endl;
+            printHelp(name);
+        }
         else
-            std::cerr << "Unknown command '" << name << "'." << endl;
+        {
+            cerr << "Unknown command '" << name << "'." << endl;
+            printHelp();
+        }
         return EXIT_FAILURE;
     }
     template <size_t I>
@@ -118,15 +129,17 @@ class CliApplication
         return find<I + 1>(name, argv);
     }
 
-    void printHelp() {
+    void printHelp( const string& command = "" ) {
         std::array<string, sizeof ... (Cs)> x = map_tuple<string>(
             commands_,
             [](auto t) {
             return t.to_string();
         });
 
-        for (const string& c : x)
-            cout << c << endl;
+        for (const string& c : x) {
+            if (c.empty() || c.find( command ) == 0)
+                cerr << c << endl;
+        }
     }
 
 public:
