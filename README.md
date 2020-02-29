@@ -1,4 +1,4 @@
-# jlaunch
+# jlgen
 
 Yet another Java launcher for Windows. Unique features are:
 * Starts an application from a [JLink](https://docs.oracle.com/en/java/javase/11/tools/jlink.html)-generated application image.
