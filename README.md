@@ -35,5 +35,11 @@ Next step in the journey is to create an installer now that you have a complete 
 ## Links used
 * https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/intro.html
 * [Dynamic resource replacement on Windows](https://docs.microsoft.com/en-us/windows/win32/menurc/adding-deleting-and-replacing-resources)
-* https://devblogs.microsoft.com/oldnewthing/?p=12473
-* https://devblogs.microsoft.com/oldnewthing/20120720-00/?p=7083
+
+### Old new thing information
+A Microsoft Blog by Raymond Chen.  Extremely helpful information.
+* [The format of icon resources](https://devblogs.microsoft.com/oldnewthing/20120720-00/?p=7083)
+* [Part 1--Monochrome beginnings](https://devblogs.microsoft.com/oldnewthing/20101018-00/?p=12513)
+* [Part 2 - Now in color](https://devblogs.microsoft.com/oldnewthing/20101019-00/?p=12503)
+* [Part 3 - Apha blended](https://devblogs.microsoft.com/oldnewthing/20101021-00/?p=12483)
+* [Part 4 - Png images](https://devblogs.microsoft.com/oldnewthing/20101022-00/?p=12473)
