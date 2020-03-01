@@ -18,7 +18,6 @@
 #include <sstream>
 #include <vector>
 
-#include "Image.h"
 #include "RtIconGroup.h"
 #include "RtStringTable.h"
 
