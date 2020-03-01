@@ -1,0 +1,1 @@
+x64\Release\jlgen.exe MakeLauncher C:\cygwin64\tmp\MMT_sample.exe mmt-icon-1024.png app.mmt de/michab/app/mmt/Mmt
