@@ -23,8 +23,14 @@
 #include "resource.h"
 #include "../jlaunch/jlaunch_resource_ids.h"
 
+using std::string;
+using mob::ResourceMgr;
+using mob::windows::RtIconGroup;
+using mob::windows::RtIcon;
+
 namespace jlgen
 {
+
     /**
      * Update the icon with the given id in the executable.
      *
@@ -35,8 +41,6 @@ namespace jlgen
         int resId,
         std::string iconFile)
     {
-        using mob::windows::RtIconGroup;
-
         mob::ResourceMgr target{ exeFile };
 
         RtIconGroup icon{ iconFile };
@@ -53,39 +57,44 @@ namespace jlgen
      *
      * UpdateIcon C:\Users\Michael\svn\rep_github\jlaunch\x64\Debug\jlaunch.exe ..\mmt-icon-1024.png
      */
-    int UpdateIcon2(
-        std::string exeFile,
-        std::string iconFile)
+    void UpdateIconImpl(
+        ResourceMgr& target,
+        string iconFile)
     {
-        using mob::windows::RtIconGroup;
-        using mob::windows::RtIcon;
-
         std::vector<std::unique_ptr<RtIcon>> outHolder;
         smack::util::icons::CreateIcons(
-            outHolder, 
+            outHolder,
             { 16, 32, 64, 128, 256 },
             iconFile);
 
-        mob::ResourceMgr target{ exeFile };
-
         RtIconGroup iconGroup;
 
-        for (size_t i = 0; i < outHolder.size(); ++i)
-        {
-            std::unique_ptr<RtIcon>& a
-                = outHolder[i];
-
+        for (std::unique_ptr<RtIcon>& a : outHolder)
             iconGroup.Add(a.get());
-        }
 
-        target.addIcon(1, iconGroup);
+        target.addIcon(IDI_ICON, iconGroup);
+    }
+
+    /**
+     * Update the icon with the given id in the executable.
+     *
+     * UpdateIcon C:\Users\Michael\svn\rep_github\jlaunch\x64\Debug\jlaunch.exe ..\mmt-icon-1024.png
+     */
+    int UpdateIcon2(
+        string exeFile,
+        string iconFile)
+    {
+        ResourceMgr target{ exeFile };
+        UpdateIconImpl(
+            target,
+            iconFile );
         target.commit();
 
         return 0;
     }
 
     int WriteLauncher(
-        std::string targetFile)
+        string targetFile)
     {
         HMODULE self = GetModuleHandleA(nullptr);
 
@@ -129,43 +138,52 @@ namespace jlgen
         return 0;
     }
 
+    /*
+     * MakeLauncher C:\cygwin64\tmp\MMT.exe ..\mmt-icon-1024.png  mmt.app de/michab/app/mmt/Mmt
+     */
     int MakeLauncher(
-        std::string targetFile,
-        std::string iconFile,
-        std::string moduleName,
-        std::string startClass
+        string targetFile,
+        string iconFile,
+        string moduleName,
+        string startClass
     )
     {
         WriteLauncher(targetFile);
 
-        mob::ResourceMgr target{ targetFile };
+        ResourceMgr target{ targetFile };
 
         mob::windows::RtString strings;
-        strings.Add(314, startClass);
-        strings.Add(313, moduleName);
-        target.addString(313, strings);
-        target.commit();
+        strings.Add(
+            IDS_JAVA_MAIN_CLASS, 
+            startClass);
+        strings.Add(
+            IDS_JAVA_MAIN_MODULE, 
+            moduleName);
+        target.addString(
+            IDS_STRINGS,
+            strings);
 
-        UpdateIcon(targetFile, 312, iconFile);
+        UpdateIconImpl(target, iconFile);
+
+        target.commit();
 
         return 0;
     }
 
-    int WriteImageSet(std::string file)
+    int WriteImageSet(string file)
     {
         smack::util::icons::WriteImageSet(file);
         return 0;
     }
 
-    int WriteIconFile(std::string file)
+    int WriteIconFile(string file)
     {
         smack::util::icons::WriteIconFile(file);
         return 0;
     }
 
-    int execute(const std::vector<std::string>& argv) {
+    int execute(const std::vector<string>& argv) {
         using smack::util::Commands;
-        using std::string;
 
         auto cmd0 = Commands<string, int, string>::make(
             "UpdateIcon",
@@ -203,7 +221,7 @@ namespace jlgen
 int main(int argc, char** argv) {
     std::cout << argv[0] << std::endl;
 
-    std::vector<std::string> cmdArgv(
+    std::vector<string> cmdArgv(
         argv + 1,
         argv + argc);
 
