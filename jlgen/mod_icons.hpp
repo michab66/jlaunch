@@ -8,6 +8,7 @@
 
 #pragma once
 
+#include <initializer_list>
 #include <string>
 
 #include "RtIcon.h"
@@ -35,7 +36,7 @@ void WriteIconFile(const std::string& sourceFile);
  */
 void CreateIcons(
     std::vector<std::unique_ptr<mob::windows::RtIcon>>& outHolder,
-    size_t count,
+    const std::initializer_list<uint16_t> sizes,
     const std::string& sourcePng);
 
 }

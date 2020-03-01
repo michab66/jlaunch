@@ -65,6 +65,9 @@ RtIcon::RtIcon(PGRPICONDIRENTRY dirEntry, HMODULE module)
     int resourceSize =
         SizeofResource(module, hRes);
     iconData_ = malloc(resourceSize);
+    if (iconData_ == nullptr)
+        throw std::bad_alloc();
+
     memcpy(iconData_, dir, resourceSize);
 
     directoryEntry_ = *dirEntry;
@@ -80,7 +83,7 @@ RtIcon::RtIcon(BYTE w, BYTE h, WORD bpp, std::vector<std::uint8_t> png)
     memcpy(iconData_, &png[0], dataSize_);
     directoryEntry_.bWidth =
         w;
-    directoryEntry_.bWidth =
+    directoryEntry_.bHeight =
         h;
     directoryEntry_.wPlanes =
         1;

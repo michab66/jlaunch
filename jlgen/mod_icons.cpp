@@ -31,8 +31,9 @@
 #include "winicon.h"
 
 #include "mod_util.hpp"
-#include "mod_icons.hpp"
 #include "RtIcon.h"
+
+#include "mod_icons.hpp"
 
 #pragma comment(lib, "gdiplus.lib")
 #pragma comment(lib, "Shlwapi.lib")
@@ -293,7 +294,7 @@ void WriteIconFile(const string& sourceFile)
  */
 void CreateIcons(
     vector<std::unique_ptr<RtIcon>>& outHolder,
-    size_t count,
+    const std::initializer_list<uint16_t> sizes,
     const string& sourcePng)
 {
     if (!PathFileExistsA(sourcePng.c_str()))
@@ -311,17 +312,24 @@ void CreateIcons(
     if (IsEqualCLSID(fileClsid, CLSID_NULL))
         throw std::invalid_argument("Unknown file type.");
 
-    uint8_t minimumDimension = 16;
-
-    for (size_t i = 0; i < count; ++i)
+    for (auto wdimension : sizes)
     {
-        auto dimension =
-            minimumDimension << i;
+        if (wdimension > 256 || wdimension == 0)
+            throw std::invalid_argument(
+                "Unsupported size " + std::to_string(wdimension) );
         auto binary =
-            GetImageBinary(dimension, fileClsid, bitmap);
+            GetImageBinary(
+                wdimension, 
+                fileClsid, 
+                bitmap);
+        // For a size of 256 this results in a passed dimension of 
+        // zero below which happens to be the way to specify a
+        // dimension of 256 pixels.
+        BYTE dimension =
+            static_cast<BYTE>(wdimension);
         auto icon =
-            std::unique_ptr<RtIcon>(new RtIcon(dimension, dimension, 32, binary));
-
+            std::unique_ptr<RtIcon>(
+                new RtIcon(dimension, dimension, 32, binary));
         outHolder.push_back(std::move(icon));
     }
 }

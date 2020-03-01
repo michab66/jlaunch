@@ -17,13 +17,11 @@
 
 #include "winicon.h"
 #include "ResourceMgr.h"
-#include "Image.h"
 #include "RtIconGroup.h"
 #include "RtStringTable.h"
-
 #include "mod_icons.hpp"
-
 #include "resource.h"
+#include "../jlaunch/jlaunch_resource_ids.h"
 
 namespace jlgen
 {
@@ -63,8 +61,10 @@ namespace jlgen
         using mob::windows::RtIcon;
 
         std::vector<std::unique_ptr<RtIcon>> outHolder;
-        // Icons sizes 16, 32, 64, 128.
-        smack::util::icons::CreateIcons(outHolder, 4, iconFile);
+        smack::util::icons::CreateIcons(
+            outHolder, 
+            { 16, 32, 64, 128, 256 },
+            iconFile);
 
         mob::ResourceMgr target{ exeFile };
 
