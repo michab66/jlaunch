@@ -1,0 +1,1 @@
+x64\Release\jlgen.exe MakeLauncher C:\cygwin64\tmp\MMT_sample.exe felix.png app.mmtsec de/michab/app/mmtsec/MmtSec
