@@ -1,5 +1,4 @@
-/*
- * $Id$
+/* $Id$
  *
  * Copyright (c) 2019-2020 Michael Binz
  */
@@ -8,6 +7,7 @@
 #undef UNICODE
 
 #include <cstdio>
+#include <fstream>
 #include <iostream>
 #include <memory>
 #include <string>
@@ -24,7 +24,7 @@
 #include "../jlaunch/jlaunch_resource_ids.h"
 
 using std::string;
-using mob::ResourceMgr;
+using mob::windows::ResourceMgr;
 using mob::windows::RtIconGroup;
 using mob::windows::RtIcon;
 
@@ -41,7 +41,7 @@ namespace jlgen
         int resId,
         std::string iconFile)
     {
-        mob::ResourceMgr target{ exeFile };
+        ResourceMgr target{ exeFile };
 
         RtIconGroup icon{ iconFile };
 

@@ -1,9 +1,7 @@
 /*
- * Simplest Java Launcher.
+ * $Id$
  *
- * Copyright (c) 2019 Michael G. Binz
- *
- * LGPL
+ * Copyright (c) 2019 Michael Binz
  */
 
 #pragma once
@@ -13,36 +11,41 @@
 #include <windows.h>
 
 #include <string>
-#include <iostream>
-#include <fstream>
-#include <sstream>
-#include <vector>
 
 #include "RtIconGroup.h"
 #include "RtStringTable.h"
 
 namespace mob {
-    // https://github.com/BillyONeal/Instalog/blob/master/LogCommon/Win32Exception.hpp
+namespace windows {
 
-    class ResourceMgr
-    {
-    private:
-        HANDLE handle_;
+using std::string;
+using mob::windows::RtIconGroup;
+using mob::windows::RtString;
 
-    public:
-        ResourceMgr(std::string exeFileName);
-        ~ResourceMgr();
+/**
+ * The handle to resources in an executable.
+ */
+class ResourceMgr
+{
+private:
+    HANDLE handle_;
 
-        void commit();
+public:
+    ResourceMgr(string exeFileName);
+    ~ResourceMgr();
 
-        /**
-         * Update a string resource.
-         */
-        void addString(int resourceId, mob::windows::RtString& string);
+    void commit();
 
-        /**
-         * Update an icon resource.
-         */
-        void addIcon(int resourceId, mob::windows::RtIconGroup& icon);
-    };
-} // mob
+    /**
+        * Update a string resource.
+        */
+    void addString(int resourceId, RtString& string);
+
+    /**
+        * Update an icon resource.
+        */
+    void addIcon(int resourceId, RtIconGroup& icon);
+};
+
+} // namespace windows
+} // namespace mob

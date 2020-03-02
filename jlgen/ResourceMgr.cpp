@@ -3,16 +3,18 @@
  *
  * Copyright (c) 2019 Michael Binz
  */
-#include <iostream>
-#include <string>
+
+#include <stdexcept>
 
 #include "ResourceMgr.h"
 #include "RtIconGroup.h"
 
 namespace mob
 {
+namespace windows
+{
 
-ResourceMgr::ResourceMgr(std::string exeFileName) 
+ResourceMgr::ResourceMgr(string exeFileName) 
 {
     handle_ = BeginUpdateResource(
         exeFileName.c_str(),
@@ -40,11 +42,12 @@ void ResourceMgr::commit()
 /**
  * Update an icon resource.
  */
-void ResourceMgr::addIcon(int resourceId, mob::windows::RtIconGroup& icon) {
+void ResourceMgr::addIcon(int resourceId, RtIconGroup& icon) {
     icon.update(handle_, resourceId);
 }
-void ResourceMgr::addString(int resourceId, mob::windows::RtString& icon) {
+void ResourceMgr::addString(int resourceId, RtString& icon) {
     icon.update(handle_, resourceId);
 }
 
-} // mob
+} // namespace windows
+} // namespace mob
