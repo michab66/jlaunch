@@ -135,7 +135,7 @@ namespace jlgen
         if (out.fail())
             throw std::invalid_argument("Could not close target file.");
 
-        return 0;
+        return EXIT_SUCCESS;
     }
 
     /*
@@ -167,7 +167,7 @@ namespace jlgen
 
         target.commit();
 
-        return 0;
+        return EXIT_SUCCESS;
     }
 
     int WriteImageSet(string file)
