@@ -19,7 +19,6 @@
 
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
-#include <tchar.h>
 
  // Define JAVA_HOME in project include paths if this is not found.
 #include <jni.h>
@@ -196,7 +195,8 @@ int APIENTRY wWinMain(
     {
         return launch(hInstance);
     }
-    catch (std::invalid_argument & e) {
+    catch (std::invalid_argument& e) 
+    {
         return dieWithMessage(e.what());
     }
 }

@@ -1,5 +1,9 @@
 /*
- * Copyright © 2019 Michael Binz
+ * $Id$
+ *
+ * Console application helper.
+ *
+ * Copyright (c) 2019-2020 Michael Binz
  */
 
 #include "util_console_app.hpp"

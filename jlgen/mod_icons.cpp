@@ -155,7 +155,7 @@ namespace
             istream,
             &clsid);
 
-        //get memory handle associated with istream
+        // Get the memory handle associated with istream.
         HGLOBAL hg = NULL;
         rc = GetHGlobalFromStream(istream, &hg);
         if (rc != NOERROR)
@@ -168,6 +168,8 @@ namespace
 
         //lock & unlock memory
         LPVOID pimage = GlobalLock(hg);
+        if ( ! pimage )
+            throw std::bad_alloc();
         memcpy(&result[0], pimage, bufsize);
         GlobalUnlock(hg);
 

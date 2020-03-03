@@ -14,65 +14,6 @@ namespace mob
 namespace windows
 {
 
-RtIcon::RtIcon(HANDLE file, DWORD offset, PGRPICONDIRENTRY entry)
-{
-    // Allocate memory to hold the image
-    iconData_ = malloc(
-        entry->dwBytesInRes);
-    // Seek to the location in the file that has the image
-    SetFilePointer(
-        file, 
-        offset,
-        NULL, 
-        FILE_BEGIN);
-
-    // Read the image data
-    ReadFile(
-        file,
-        iconData_,
-        entry->dwBytesInRes,
-        &dataSize_, 
-        NULL);
-    // Result check TODO
-
-    directoryEntry_ =
-        *entry;
-}
-
-RtIcon::RtIcon(PGRPICONDIRENTRY dirEntry, HMODULE module)
-{
-    auto id = 
-        dirEntry->nId;
-    // Locate the resource in the .EXE file.
-    HRSRC hRes = FindResource(
-        module, 
-        MAKEINTRESOURCE(id), 
-        RT_ICON);
-    if (hRes == NULL)
-        throw std::invalid_argument("Could not locate icons.");
-
-    // Load the resource.
-    HGLOBAL hResLoad = LoadResource(module, hRes);
-    if (hResLoad == NULL)
-        throw std::invalid_argument("Could not load resource.");
-
-    // Lock the resource into global memory.
-    PGRPICONDIR dir = (PGRPICONDIR)LockResource(hResLoad);
-    if (dir == NULL)
-        throw std::invalid_argument("Could not lock resource.");
-
-    // Perform a copy to be in-line with the icon file reader.
-    int resourceSize =
-        SizeofResource(module, hRes);
-    iconData_ = malloc(resourceSize);
-    if (iconData_ == nullptr)
-        throw std::bad_alloc();
-
-    memcpy(iconData_, dir, resourceSize);
-
-    directoryEntry_ = *dirEntry;
-}
-
 RtIcon::RtIcon(BYTE w, BYTE h, WORD bpp, std::vector<std::uint8_t> png)
 {
     dataSize_ =

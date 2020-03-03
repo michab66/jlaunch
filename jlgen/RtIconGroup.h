@@ -31,9 +31,7 @@ namespace windows
 
     public:
         RtIconGroup() {};
-        RtIconGroup(std::string iconFile);
-        RtIconGroup(int resourceId, std::string exeName);
-        ~RtIconGroup();
+        ~RtIconGroup() {};
 
         void Add(RtIcon* icon)
         {
@@ -41,8 +39,6 @@ namespace windows
         }
 
         void update(HANDLE resourceHolder, int resourceId);
-
-        void Dump();
     };
 
 } // namespace windows

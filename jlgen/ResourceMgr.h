@@ -39,12 +39,12 @@ public:
     /**
         * Update a string resource.
         */
-    void addString(int resourceId, RtString& string);
+    void add(int resourceId, RtString& string);
 
     /**
         * Update an icon resource.
         */
-    void addIcon(int resourceId, RtIconGroup& icon);
+    void add(int resourceId, RtIconGroup& icon);
 };
 
 } // namespace windows

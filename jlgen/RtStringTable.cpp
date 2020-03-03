@@ -11,18 +11,10 @@
 #include <string>
 
 #include "RtStringTable.h"
+#include "mod_util.hpp"
 
 using std::string;
 using std::wstring;
-
-template<typename T>
-void bang(std::vector<uint8_t>& v, size_t size, const T* value)
-{
-    uint8_t* pointer = (uint8_t*)value;
-
-    for (int i = 0; i < size; ++i)
-        v.push_back(pointer[i]);
-}
 
 /**
  * Make a resource string table.
@@ -50,17 +42,21 @@ void mob::windows::RtString::update(HANDLE resourceHolder, int resourceId)
         if ( c == strings_.end() )
         {
             WORD zero = 0;
-            bang(buffer, sizeof(zero), &zero);
+            smack::util::rawAppend(buffer, &zero);
         }
         else
         {
-            WORD len = (WORD)c->second.length();
-            bang(buffer, sizeof(len), &len);
-            // TODO use new converter from util.
-            std::wstring_convert<std::codecvt_utf8_utf16<wchar_t>> converter;
-            wstring wstr = converter.from_bytes(c->second);
-            const wchar_t* contents = wstr.c_str();
-            bang(buffer, wstr.length() * sizeof(wchar_t), contents);
+            WORD len = 
+                static_cast<WORD>(c->second.length());
+            smack::util::rawAppend(
+                buffer,
+                &len);
+            auto wstr = 
+                smack::util::convert(c->second);
+            smack::util::rawAppend(
+                buffer, 
+                wstr.c_str(),
+                wstr.length() * sizeof(wchar_t) );
         }
     }
 
@@ -69,14 +65,8 @@ void mob::windows::RtString::update(HANDLE resourceHolder, int resourceId)
         RT_STRING,
         MAKEINTRESOURCE(bundle1),
         MAKELANGID(LANG_NEUTRAL, SUBLANG_NEUTRAL),
-        (LPVOID*)buffer.data(),
+        static_cast<LPVOID>(buffer.data()),
         static_cast<DWORD>(buffer.size()));
     if (result == FALSE)
         throw std::invalid_argument("Could not add resource.");
-
-    //for (auto i = strings_.begin(); i != strings_.end(); ++i)
-    //{
-    //    int x = i->first;
-    //    std::cout << i->first << " = " << i->second << std::endl;
-    //}
 }

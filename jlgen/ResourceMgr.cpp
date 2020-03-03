@@ -1,7 +1,9 @@
 /*
  * $Id$
  *
- * Copyright (c) 2019 Michael Binz
+ * ResourceManager implementation.
+ *
+ * Copyright (c) 2019-2020 Michael G. Binz
  */
 
 #include <stdexcept>
@@ -42,10 +44,10 @@ void ResourceMgr::commit()
 /**
  * Update an icon resource.
  */
-void ResourceMgr::addIcon(int resourceId, RtIconGroup& icon) {
+void ResourceMgr::add(int resourceId, RtIconGroup& icon) {
     icon.update(handle_, resourceId);
 }
-void ResourceMgr::addString(int resourceId, RtString& icon) {
+void ResourceMgr::add(int resourceId, RtString& icon) {
     icon.update(handle_, resourceId);
 }
 

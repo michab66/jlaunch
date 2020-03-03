@@ -26,13 +26,6 @@ namespace windows
 
     public:
         RtIcon(
-            HANDLE file, 
-            DWORD offset,
-            PGRPICONDIRENTRY entry);
-        RtIcon(
-            PGRPICONDIRENTRY dirEntry, 
-            HMODULE module);
-        RtIcon(
             BYTE w,
             BYTE h,
             WORD bpp,

@@ -57,7 +57,7 @@ namespace jlgen
         for (std::unique_ptr<RtIcon>& a : outHolder)
             iconGroup.Add(a.get());
 
-        target.addIcon(IDI_ICON, iconGroup);
+        target.add(IDI_ICON, iconGroup);
     }
 
     int WriteLauncher(
@@ -85,7 +85,6 @@ namespace jlgen
         if (dir == NULL)
             throw std::invalid_argument("Could not lock resource.");
 
-        // Perform a copy to be in-line with the icon file reader.
         int resourceSize =
             SizeofResource(nullptr, hRes);
 
@@ -94,7 +93,8 @@ namespace jlgen
         if (out.fail())
             throw std::invalid_argument("Could not open target file.");
 
-        out.write((const char*)dir, resourceSize);
+        out.write(
+            (const char*)dir, resourceSize);
         if (out.fail())
             throw std::invalid_argument("Could not write to target file.");
 
@@ -126,7 +126,7 @@ namespace jlgen
         strings.Add(
             IDS_JAVA_MAIN_MODULE, 
             moduleName);
-        target.addString(
+        target.add(
             IDS_STRINGS,
             strings);
 
