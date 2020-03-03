@@ -20,17 +20,12 @@ using std::string;
 
 /**
  * Use the passed image to create a set of scaled, square images in the
- * dimensions 16, 32, 64, 128, 256.  It is recommended to pass a square
- * image though all image sizes will do.
+ * supported dimensions.  It is recommended to pass a square image though
+ * all image sizes will do.
  */
-void WriteImageSet(const string& sourceFile);
-
-/**
- * Use the passed image to create a set of scaled, square images in the
- * dimensions 16, 32, 64, 128, 256.  It is recommended to pass a square
- * image though all image sizes will do.
- */
-void WriteIconFile(const string& sourceFile);
+void WriteImageSet(
+    const string& sourceFile,
+    const std::initializer_list<uint16_t> sizes);
 
 /**
  * Create a set of scaled icons and place them into the passed container.

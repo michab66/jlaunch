@@ -6,10 +6,6 @@
  * Copyright (c) 2019-2020 Michael G. Binz
  */
 
-// Resources
-// https://devblogs.microsoft.com/oldnewthing/20101022-00/?p=12473
-// https://stackoverflow.com/questions/51383896/c-gdibitmap-to-png-image-in-memory
-
 // See https://docs.microsoft.com/en-us/windows/uwp/design/globalizing/use-utf8-code-page
 #undef UNICODE
 
@@ -25,7 +21,6 @@
 #include <fstream>
 #include <string>
 #include <map>
-#include <sstream>
 #include <vector>
 
 #include "winicon.h"
@@ -152,7 +147,9 @@ namespace
 
         //write to IStream
         IStream* istream = nullptr;
-        HRESULT hr = CreateStreamOnHGlobal(NULL, TRUE, &istream);
+        HRESULT rc = CreateStreamOnHGlobal(NULL, TRUE, &istream);
+        if ( rc != NOERROR )
+            throw std::invalid_argument("CreateStreamOnHGlobal");
 
         resized.Save(
             istream,
@@ -160,7 +157,9 @@ namespace
 
         //get memory handle associated with istream
         HGLOBAL hg = NULL;
-        GetHGlobalFromStream(istream, &hg);
+        rc = GetHGlobalFromStream(istream, &hg);
+        if (rc != NOERROR)
+            throw std::invalid_argument("GetHGlobalFromStream");
 
         //copy IStream to buffer
         size_t bufsize = GlobalSize(hg);
@@ -189,14 +188,11 @@ namespace
             clsid,
             bitmap);
 
-        std::ostringstream collector;
-        collector <<
-            name <<
-            "-" <<
-            dimension <<
+        string targetName =
+            name +
+            "-" +
+            std::to_string(dimension) +
             suffix;
-
-        string targetName = collector.str();
 
         // Write to file.
         std::ofstream fout(
@@ -219,7 +215,9 @@ namespace icons {
  * dimensions 16, 32, 64, 128, 256.  It is recommended to pass a square
  * image though all image sizes will do.
  */
-void WriteImageSet(const string& sourceFile)
+void WriteImageSet(
+    const string& sourceFile, 
+    const std::initializer_list<uint16_t> sizes)
 {
     InitGdiPlus init;
 
@@ -240,53 +238,9 @@ void WriteImageSet(const string& sourceFile)
         GetPath(sourceFile);
     string suffix =
         GetSuffix(sourceFile);
-    WriteImageFile(baseName, suffix, 16, fileClsid, bitmap);
-    WriteImageFile(baseName, suffix, 32, fileClsid, bitmap);
-    WriteImageFile(baseName, suffix, 64, fileClsid, bitmap);
-    WriteImageFile(baseName, suffix, 128, fileClsid, bitmap);
-    WriteImageFile(baseName, suffix, 256, fileClsid, bitmap);
-}
 
-/**
- * Use the passed image to create an icon file.
- */
-void WriteIconFile(const string& sourceFile)
-{
-    InitGdiPlus init;
-
-    if (!PathFileExistsA(sourceFile.c_str()))
-        throw std::invalid_argument("File not found.");
-
-    std::wstring wideName =
-        smack::util::convert(sourceFile);
-
-    Gdiplus::Bitmap bitmap{ wideName.c_str() };
-
-    CLSID fileClsid =
-        GetClsid(bitmap);
-    if (IsEqualCLSID(fileClsid, CLSID_NULL))
-        throw std::invalid_argument("Unknown file type.");
-
-    string baseName =
-        GetPath(sourceFile);
-    string suffix =
-        GetSuffix(sourceFile);
-
-    auto scaled = GetImageBinary(16, fileClsid, bitmap);
-
-    std::cout << "Size is: " << scaled.size() << std::endl;
-
-    baseName.append("-icn");
-    baseName.append(suffix);
-
-    std::ofstream fout(
-        baseName.c_str(), 
-        std::ios::binary);
-    fout.write(
-        (char*)scaled.data(), 
-        scaled.size() );
-    // Trigger write error here, not in destructor.
-    fout.close();
+    for (auto c : sizes)
+        WriteImageFile(baseName, suffix, c, fileClsid, bitmap);
 }
 
 /**
