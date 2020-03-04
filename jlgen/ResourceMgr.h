@@ -1,5 +1,4 @@
-/*
- * $Id$
+/* $Id$
  *
  * Copyright (c) 2019 Michael Binz
  */

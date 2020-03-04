@@ -1,5 +1,4 @@
-/*
- * $Id$
+/* $Id$
  *
  * Icon routines.
  *
@@ -106,12 +105,6 @@ namespace
             Gdiplus::ImageCodecInfo* c =
                 &tbuffer[i];
 
-            std::cout <<
-                i <<
-                " : "
-                << smack::util::convert( c->MimeType )
-                << std::endl;
-
             if (IsEqualCLSID(c->FormatID, raw))
                 return c->Clsid;
         }
@@ -145,7 +138,7 @@ namespace
             dimension,
             dimension);
 
-        //write to IStream
+        // Write to IStream
         IStream* istream = nullptr;
         HRESULT rc = CreateStreamOnHGlobal(NULL, TRUE, &istream);
         if ( rc != NOERROR )

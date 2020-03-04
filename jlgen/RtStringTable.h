@@ -1,3 +1,8 @@
+/* $Id$
+ *
+ * Copyright (c) 2019-2020 Michael Binz
+ */
+
 #pragma once
 
 #include <map>
@@ -11,7 +16,7 @@ namespace windows
 {
 
 /**
- * A binary resource.
+ * A string resource.
  */
 class RtString : RtBase
 {

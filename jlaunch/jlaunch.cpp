@@ -1,6 +1,6 @@
-/*
+/* $Id$
+ *
  * Java Launcher.
- * $Id$
  *
  * Copyright (c) 2020 Michael G. Binz
  *
@@ -8,9 +8,9 @@
  * executable is part of JLgen.  JLgen populates the neccessary resources
  * when it creates the launcher.
  *
- * Note that the generated launcher does deliberately only work if its
- * in the same directory as the jvm.dll to prevent catching a random
- * jvm.dll in an existing java installation.
+ * Note that the generated launcher does deliberately only work if it is
+ * located in the same directory as the jvm.dll to prevent catching a 
+ * random jvm.dll in an existing java installation.
  */
 
 #include <array>

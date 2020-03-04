@@ -1,5 +1,7 @@
 /* $Id$
  *
+ * Generator cli implementation.
+ *
  * Copyright (c) 2019-2020 Michael Binz
  */
 
@@ -24,6 +26,7 @@
 #include "../jlaunch/jlaunch_resource_ids.h"
 
 using std::string;
+using std::cerr;
 using mob::windows::ResourceMgr;
 using mob::windows::RtIconGroup;
 using mob::windows::RtIcon;
@@ -81,7 +84,7 @@ namespace jlgen
             throw std::invalid_argument("Could not load resource.");
 
         // Lock the resource into global memory.
-        void  *dir = LockResource(hResLoad);
+        void* dir = LockResource(hResLoad);
         if (dir == nullptr)
             throw std::invalid_argument("Could not lock resource.");
 
@@ -94,7 +97,7 @@ namespace jlgen
             throw std::invalid_argument("Could not open target file.");
 
         out.write(
-            static_cast<const char *>(dir), resourceSize);
+            static_cast<const char*>(dir), resourceSize);
         if (out.fail())
             throw std::invalid_argument("Could not write to target file.");
 
@@ -115,23 +118,29 @@ namespace jlgen
         string startClass
     )
     {
+        cerr << "Creating launcher: " << targetFile << std::endl;
         WriteLauncher(targetFile);
 
         ResourceMgr target{ targetFile };
 
         mob::windows::RtString strings;
+        cerr << "Adding main class name: " << startClass << std::endl;
         strings.Add(
             IDS_JAVA_MAIN_CLASS, 
             startClass);
+        cerr << "Adding main module name: " << moduleName << std::endl;
         strings.Add(
             IDS_JAVA_MAIN_MODULE, 
             moduleName);
+        cerr << "Adding info to string table."<< std::endl;
         target.add(
             IDS_STRINGS,
             strings);
 
+        cerr << "Adding icons from: " << iconFile << std::endl;
         UpdateIconImpl(target, iconFile);
 
+        cerr << "Committing resource additions." << std::endl;
         target.commit();
 
         return EXIT_SUCCESS;
