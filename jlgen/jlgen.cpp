@@ -176,8 +176,6 @@ namespace jlgen
 
 // MakeLauncher c:\cygwin64\tmp\xxx.exe C:\cygwin64\tmp\jlaunch\MMT.ico app.mmt de/michab/app/mmt/Mmt
 int main(int argc, char** argv) {
-    std::cout << argv[0] << std::endl;
-
     std::vector<string> cmdArgv(
         argv + 1,
         argv + argc);
