@@ -70,19 +70,19 @@ namespace jlgen
             self,
             MAKEINTRESOURCE(IDR_BINARY1),
             RT_RCDATA);
-        if (hRes == NULL)
+        if (hRes == nullptr)
             throw std::invalid_argument("Could not locate binary resource.");
 
         // Load the resource.
         HGLOBAL hResLoad = LoadResource(
             self,
             hRes);
-        if (hResLoad == NULL)
+        if (hResLoad == nullptr)
             throw std::invalid_argument("Could not load resource.");
 
         // Lock the resource into global memory.
-        PGRPICONDIR dir = (PGRPICONDIR)LockResource(hResLoad);
-        if (dir == NULL)
+        void  *dir = LockResource(hResLoad);
+        if (dir == nullptr)
             throw std::invalid_argument("Could not lock resource.");
 
         int resourceSize =
@@ -94,7 +94,7 @@ namespace jlgen
             throw std::invalid_argument("Could not open target file.");
 
         out.write(
-            (const char*)dir, resourceSize);
+            static_cast<const char *>(dir), resourceSize);
         if (out.fail())
             throw std::invalid_argument("Could not write to target file.");
 
