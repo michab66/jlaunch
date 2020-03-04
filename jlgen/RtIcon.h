@@ -20,16 +20,15 @@ namespace windows
     class RtIcon : RtBase
     {
         GRPICONDIRENTRY directoryEntry_{};
-        DWORD dataSize_ = 0;
-        LPVOID iconData_ = 0;
+        std::vector<std::uint8_t> data_;
 
     public:
         RtIcon(
             BYTE w,
             BYTE h,
             WORD bpp,
-            std::vector<std::uint8_t> png);
-        ~RtIcon();
+            std::vector<std::uint8_t>& png);
+        ~RtIcon() {};
 
         void update(HANDLE resourceHolder, int resourceId);
 
