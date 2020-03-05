@@ -99,7 +99,7 @@ class CliApplication
 {
     std::tuple<Cs...> commands_;
 
-    bool found_;
+    bool found_{};
 
     template <size_t I>
     typename std::enable_if<I == sizeof...(Cs), int>::type
