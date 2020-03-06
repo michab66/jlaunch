@@ -5,11 +5,13 @@
 
 #pragma once
 
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+#include <experimental/filesystem>
+#include <string>
+
 #define WIN32_LEAN_AND_MEAN
 #undef UNICODE
 #include <windows.h>
-
-#include <string>
 
 #include "RtIconGroup.h"
 #include "RtStringTable.h"
@@ -17,6 +19,7 @@
 namespace mob {
 namespace windows {
 
+using std::experimental::filesystem::path;
 using std::string;
 using mob::windows::RtIconGroup;
 using mob::windows::RtString;
@@ -30,7 +33,7 @@ private:
     HANDLE handle_;
 
 public:
-    ResourceMgr(string exeFileName);
+    ResourceMgr(path exeFileName);
     ~ResourceMgr();
 
     void commit();

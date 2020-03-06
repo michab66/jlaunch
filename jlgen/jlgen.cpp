@@ -14,6 +14,8 @@
 #include <memory>
 #include <string>
 #include <vector>
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+#include <experimental/filesystem>
 
 #include "util_console_app.hpp"
 
@@ -27,6 +29,8 @@
 
 using std::string;
 using std::cerr;
+using std::endl;
+using std::experimental::filesystem::path;
 using mob::windows::ResourceMgr;
 using mob::windows::RtIconGroup;
 using mob::windows::RtIcon;
@@ -47,7 +51,7 @@ namespace jlgen
      */
     void UpdateIconImpl(
         ResourceMgr& target,
-        string iconFile)
+        path& iconFile)
     {
         std::vector<std::unique_ptr<RtIcon>> outHolder;
         smack::util::icons::CreateIcons(
@@ -64,7 +68,7 @@ namespace jlgen
     }
 
     int WriteLauncher(
-        string targetFile)
+        path& targetFile)
     {
         HMODULE self = GetModuleHandleA(nullptr);
 
@@ -92,7 +96,7 @@ namespace jlgen
             SizeofResource(nullptr, hRes);
 
         std::ofstream out;
-        out.open(targetFile.c_str(), std::ofstream::binary);
+        out.open(targetFile, std::ofstream::binary);
         if (out.fail())
             throw std::invalid_argument("Could not open target file.");
 
@@ -112,41 +116,42 @@ namespace jlgen
      * MakeLauncher C:\cygwin64\tmp\MMT.exe ..\mmt-icon-1024.png  mmt.app de/michab/app/mmt/Mmt
      */
     int MakeLauncher(
-        string targetFile,
-        string iconFile,
-        string moduleName,
-        string startClass
+        path& targetFile,
+        path& iconFile,
+        string& moduleName,
+        string& startClass
     )
     {
-        cerr << "Creating launcher: " << targetFile << std::endl;
+        cerr << "Creating launcher: " << targetFile << endl;
         WriteLauncher(targetFile);
 
         ResourceMgr target{ targetFile };
 
         mob::windows::RtString strings;
-        cerr << "Adding main class name: " << startClass << std::endl;
+        cerr << "Adding main class name: " << startClass << endl;
         strings.Add(
             IDS_JAVA_MAIN_CLASS, 
             startClass);
-        cerr << "Adding main module name: " << moduleName << std::endl;
+        cerr << "Adding main module name: " << moduleName << endl;
         strings.Add(
             IDS_JAVA_MAIN_MODULE, 
             moduleName);
-        cerr << "Adding info to string table."<< std::endl;
+        cerr << "Adding info to string table."<< endl;
         target.add(
             IDS_STRINGS,
             strings);
 
-        cerr << "Adding icons from: " << iconFile << std::endl;
+        cerr << "Adding icons from: " << iconFile << endl;
         UpdateIconImpl(target, iconFile);
 
-        cerr << "Committing resource additions." << std::endl;
+        cerr << "Committing resource additions." << endl;
         target.commit();
 
         return EXIT_SUCCESS;
     }
 
-    int WriteImageSet(string file)
+    int WriteImageSet(
+        string& file)
     {
         smack::util::icons::WriteImageSet(
             file,
@@ -159,10 +164,10 @@ namespace jlgen
 
         auto cli = smack::util::makeCliApplication(
 
-            Commands<string>::make(
+            Commands<path>::make(
                 "WriteLauncher",
                 WriteLauncher) ,
-            Commands<string, string, string, string>::make(
+            Commands<path, path, string, string>::make(
                 "MakeLauncher",
                 MakeLauncher),
             Commands<string>::make(

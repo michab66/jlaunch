@@ -11,6 +11,8 @@
 #include <array>
 #include <cstddef>
 #include <cstdlib>
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+#include <experimental/filesystem>
 #include <functional>
 #include <iomanip>
 #include <iostream>
@@ -70,8 +72,10 @@ constexpr const char* resolve_type() {
         return "string";
     else if (typeid(string) == typeid(T))
         return "string";
+    else if (typeid(std::experimental::filesystem::path) == typeid(T))
+        return "filename";
 
-    return "unknown";
+    return typeid(T).name();
 }
 
 template<typename R, size_t I = 0, typename Func, typename ...Ts>

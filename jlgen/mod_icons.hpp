@@ -7,6 +7,8 @@
 
 #pragma once
 
+#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
+#include <experimental/filesystem>
 #include <initializer_list>
 #include <string>
 
@@ -17,6 +19,7 @@ namespace util {
 namespace icons {
 
 using std::string;
+using std::experimental::filesystem::path;
 
 /**
  * Use the passed image to create a set of scaled, square images in the
@@ -24,7 +27,7 @@ using std::string;
  * all image sizes will do.
  */
 void WriteImageSet(
-    const string& sourceFile,
+    const path& sourceFile,
     const std::initializer_list<uint16_t> sizes);
 
 /**
@@ -33,7 +36,7 @@ void WriteImageSet(
 void CreateIcons(
     std::vector<std::unique_ptr<mob::windows::RtIcon>>& outHolder,
     const std::initializer_list<uint16_t> sizes,
-    const string& sourcePng);
+    const path& sourcePng);
 
 }
 }

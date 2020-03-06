@@ -16,10 +16,10 @@ namespace mob
 namespace windows
 {
 
-ResourceMgr::ResourceMgr(string exeFileName) 
+ResourceMgr::ResourceMgr(path exeFileName) 
 {
     handle_ = BeginUpdateResource(
-        exeFileName.c_str(),
+        exeFileName.generic_string().c_str(),
         TRUE);
 
     if (!handle_)

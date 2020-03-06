@@ -5,7 +5,13 @@
  * Copyright (c) 2019-2020 Michael G. Binz
  */
 
-// See https://docs.microsoft.com/en-us/windows/uwp/design/globalizing/use-utf8-code-page
+#include <iostream>
+#include <fstream>
+#include <string>
+#include <map>
+#include <vector>
+
+ // See https://docs.microsoft.com/en-us/windows/uwp/design/globalizing/use-utf8-code-page
 #undef UNICODE
 
 // Use extendedGDI+.
@@ -15,12 +21,6 @@
 #include <windows.h>
 #include <Gdiplus.h>
 #include "Shlwapi.h"
-
-#include <iostream>
-#include <fstream>
-#include <string>
-#include <map>
-#include <vector>
 
 #include "winicon.h"
 
@@ -32,6 +32,8 @@
 #pragma comment(lib, "gdiplus.lib")
 #pragma comment(lib, "Shlwapi.lib")
 
+using std::experimental::filesystem::exists;
+using std::experimental::filesystem::path;
 using std::string;
 using std::vector;
 using Gdiplus::Graphics;
@@ -211,16 +213,16 @@ namespace icons {
  * image though all image sizes will do.
  */
 void WriteImageSet(
-    const string& sourceFile, 
+    const path& sourceFile, 
     const std::initializer_list<uint16_t> sizes)
 {
     InitGdiPlus init;
 
-    if (!PathFileExistsA(sourceFile.c_str()))
+    if (!exists(sourceFile))
         throw std::invalid_argument("File not found.");
 
     std::wstring wideName = 
-        smack::util::convert(sourceFile);
+        sourceFile.c_str();
 
     Gdiplus::Bitmap bitmap{ wideName.c_str() };
 
@@ -230,9 +232,9 @@ void WriteImageSet(
         throw std::invalid_argument("Unknown file type.");
 
     string baseName =
-        GetPath(sourceFile);
-    string suffix =
-        GetSuffix(sourceFile);
+        GetPath(sourceFile.generic_string());
+    string suffix = 
+        GetSuffix(sourceFile.generic_string());
 
     for (auto c : sizes)
         WriteImageFile(baseName, suffix, c, fileClsid, bitmap);
@@ -244,17 +246,14 @@ void WriteImageSet(
 void CreateIcons(
     vector<std::unique_ptr<RtIcon>>& outHolder,
     const std::initializer_list<uint16_t> sizes,
-    const string& sourcePng)
+    const path& sourcePng)
 {
-    if (!PathFileExistsA(sourcePng.c_str()))
+    if (!exists(sourcePng))
         throw std::invalid_argument("File not found.");
 
     InitGdiPlus init;
 
-    std::wstring wideName =
-        smack::util::convert(sourcePng);
-
-    Gdiplus::Bitmap bitmap{ wideName.c_str() };
+    Gdiplus::Bitmap bitmap{ sourcePng.c_str() };
 
     CLSID fileClsid =
         GetClsid(bitmap);
