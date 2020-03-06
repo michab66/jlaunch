@@ -33,6 +33,7 @@ using std::string;
 using std::cout;
 using std::cerr;
 using std::endl;
+using std::initializer_list;
 using std::size_t;
 
 // Produces the necessary transformations for the char* types
@@ -229,7 +230,7 @@ private:
         return operator()(std::get<S>(params) ...);
     }
 
-    std::array<const char*, kParameterCount> parameterHelp_;
+    initializer_list<const char*> parameterHelp_;
 
     /**
      * Trigger mapping.
@@ -273,17 +274,14 @@ public:
     Command(
         string name,
         F f,
-        std::initializer_list<const char*> parameterHelp = {})
+        initializer_list<const char*> parameterHelp = {})
         :
         name_(name),
-        func_(f)
+        func_(f),
+        parameterHelp_(parameterHelp)
     {
         if ( parameterHelp.size() > parameterHelp_.size() )
             throw std::invalid_argument("Too many parameter help strings.");
-
-        size_t idx = 0;
-        for (auto c : parameterHelp)
-            parameterHelp_[idx++] = c;
     }
 
     /**
@@ -326,11 +324,9 @@ public:
         std::array<const char*, kParameterCount>
             expander{ (resolve_type<Args>()) ... };
 
-        for (size_t i = 0; i < kParameterCount; ++i) {
-            auto c = parameterHelp_[i];
-            if (c!=nullptr)
-                expander[i] = c;
-        }
+        size_t idx = 0;
+        for (auto c : parameterHelp_)
+            expander[idx++] = c;
 
         string result;
 
@@ -358,14 +354,14 @@ public:
 
 template <typename ... Args> 
 class Commands {
-	template <typename H, typename F>
-	static auto make_(H& host, F member) {
+    template <typename H, typename F>
+    static auto make_(H& host, F member) {
         return [&host, member](Args ... a) mutable {
             return (host.*(member))(a...);
         };
-	}
+    }
 
-	template <typename F>
+    template <typename F>
     static auto make_(F member) {
         return [member](Args ... a) {
             return member(a...);
@@ -378,7 +374,7 @@ public:
         string name, 
         H& host, 
         F member, 
-        std::initializer_list<const char*> parameterHelper = {})
+        initializer_list<const char*> parameterHelper = {})
     {
         auto functor =
             make_(host, member);
@@ -390,7 +386,7 @@ public:
     static auto make(
         string name,
         F function,
-        std::initializer_list<const char*> parameterHelper = {})
+        initializer_list<const char*> parameterHelper = {})
     {
         auto functor =
             make_(function);
