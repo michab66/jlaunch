@@ -14,6 +14,7 @@
 #define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
 #include <experimental/filesystem>
 #include <functional>
+#include <initializer_list>
 #include <iomanip>
 #include <iostream>
 #include <map>
@@ -228,6 +229,8 @@ private:
         return operator()(std::get<S>(params) ...);
     }
 
+    std::array<const char*, kParameterCount> parameterHelp_;
+
     /**
      * Trigger mapping.
      */
@@ -269,10 +272,18 @@ private:
 public:
     Command(
         string name,
-        F f)
+        F f,
+        std::initializer_list<const char*> parameterHelp = {})
         :
         name_(name),
-        func_(f) {
+        func_(f)
+    {
+        if ( parameterHelp.size() > parameterHelp_.size() )
+            throw std::invalid_argument("Too many parameter help strings.");
+
+        size_t idx = 0;
+        for (auto c : parameterHelp)
+            parameterHelp_[idx++] = c;
     }
 
     /**
@@ -311,9 +322,15 @@ public:
         return name_ + " " + type_name();
     }
 
-    constexpr std::string type_name() const {
+    constexpr string type_name() const {
         std::array<const char*, kParameterCount>
             expander{ (resolve_type<Args>()) ... };
+
+        for (size_t i = 0; i < kParameterCount; ++i) {
+            auto c = parameterHelp_[i];
+            if (c!=nullptr)
+                expander[i] = c;
+        }
 
         string result;
 
@@ -342,14 +359,14 @@ public:
 template <typename ... Args> 
 class Commands {
 	template <typename H, typename F>
-	static auto makeF(H& host, F member) {
+	static auto make_(H& host, F member) {
         return [&host, member](Args ... a) mutable {
             return (host.*(member))(a...);
         };
 	}
 
 	template <typename F>
-    static auto makeF(F member) {
+    static auto make_(F member) {
         return [member](Args ... a) {
             return member(a...);
         };
@@ -357,19 +374,28 @@ class Commands {
 
 public:
     template <typename H, typename F>
-    static auto make(std::string name, H& host, F member) {
+    static auto make(
+        string name, 
+        H& host, 
+        F member, 
+        std::initializer_list<const char*> parameterHelper = {})
+    {
         auto functor =
-            makeF(host, member);
+            make_(host, member);
         Command<decltype(functor), Args ...>
-            result(name, functor);
+            result(name, functor, parameterHelper);
         return result;
     }
     template <typename F>
-    static auto make(std::string name, F function) {
+    static auto make(
+        string name,
+        F function,
+        std::initializer_list<const char*> parameterHelper = {})
+    {
         auto functor =
-            makeF(function);
+            make_(function);
         Command<decltype(functor), Args ...>
-            result(name, functor);
+            result(name, functor, parameterHelper);
         return result;
     }
 };

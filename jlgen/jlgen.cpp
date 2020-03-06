@@ -166,13 +166,25 @@ namespace jlgen
 
             Commands<path>::make(
                 "WriteLauncher",
-                WriteLauncher) ,
+                WriteLauncher,
+                {
+                    "targetFilename"
+                }),
             Commands<path, path, string, string>::make(
                 "MakeLauncher",
-                MakeLauncher),
+                MakeLauncher,
+                {
+                    "targetFile",
+                    "iconFile",
+                    "moduleName",
+                    "startClass"
+                }),
             Commands<string>::make(
                 "WriteImageSet",
-                WriteImageSet)
+                WriteImageSet,
+                { 
+                    "imageFilename" 
+                })
         );
 
         return cli.launch(argv);
