@@ -30,5 +30,5 @@ In Windows Explorer the launcher is displayed with the application icon that was
 
 The next step for professional application packing is to create a native Windows installer based on the JLink file system including the `jlgen`-generated launcher that has to be configured as the start application.  We use the WiX toolkit for this purpose, but this is a different story.
 
-See the project Wiki for more information on the remaining `jlgen` commands and if you want more info on `jlgen` development.
+See the [project Wiki](https://github.com/michab66/jlaunch/wiki) for more information on the remaining `jlgen` commands and if you want more info on `jlgen` development.
 
