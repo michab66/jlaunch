@@ -25,7 +25,7 @@ A complete sample call may look like
     `jlgen MakeLauncher C:\cygwin64\tmp\Farboo.exe ..\mmt-icon-1024.png app.mmt de/michab/app/mmt/Mmt`.
     
 ## I have the launcher executable, what now?
-Note that the generated launcher--in our example 'Farboo.exe'--has to be placed in the existing jlink image directory hierarchy at the same position where the file `jvm.dll` is located.  This is currently `{jlink-app-root}/bin/server` but this may change coming versions of the Jdk. (It is a deliberate decision not to look-up the jvm.dll dynamically to prevent to start the target application using a wrong Jdk/Jre that non-deterministically happened to be found.)
+Note that the generated launcher--in our example 'Farboo.exe'--has to be placed in the existing jlink image directory hierarchy at the same position where the file `jvm.dll` is located.  This is currently `{jlink-app-root}/bin/server` but this may change in coming versions of the Jdk. (It is a deliberate decision not to look-up the jvm.dll dynamically to prevent to start the target application using a wrong Jdk/Jre that non-deterministically happened to be found.)
 
 In Windows Explorer the launcher is displayed with the application icon that was passed to `jlgen.exe` above.  On a double click your application opens, joy starts :)
 
