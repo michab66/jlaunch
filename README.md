@@ -16,11 +16,11 @@ Get the latest version of the jlgen executable from the project's [release page]
 
 ### Command `MakeLauncher`
 
-`MakeLauncher` represents the central functionalit of the software.  It generates a native Windows launcher for a JLink generated Java application image.  The required parameters are:
+`MakeLauncher` represents the central functionality of the software.  It generates a native Windows launcher for a JLink generated Java application image.  The required parameters are:
 * The name of the target file, e.g. 'Farboo.exe'.
 * The name of an icon file that is used to generate the required icon resources in the executable, e.g. 'farboo.png'.  Note that a .png file is required, no hassle with generating an .ico file.  It is recommended to offer a square high resolution image, though all sizes and resolutions will do.  This file gets scaled and resized for the resolutions 16, 32, 64, 128, 256 pixels.
-* The name of the target module. That is, the name of the module that holds the main Java application.
-* Finally, the name of the Java class representing the entry point to the application.  This class has to offer the Java-application's `public static void main( String[] argv )` operation.
+* The name of the target module. That is, the name of the module that holds the main Java application. For example `app.mmt`.
+* Finally, the name of the Java class representing the entry point to the application.  This class has to offer the Java-application's `public static void main( String[] argv )` operation.  An example is `de/michab/app/mmt/Mmt`, note that you have to use `/` in this name instead of the `.`s used for example in `package` references.
 
 A complete sample call may look like `jlgen MakeLauncher C:\cygwin64\tmp\MMT.exe ..\mmt-icon-1024.png app.mmt de/michab/app/mmt/Mmt`.
 
@@ -50,15 +50,3 @@ Next step in the journey is to create an installer now that you have a complete 
 * For debugging, set the location of the jvm.dll to use.  This is typically the jvm.dll inside your JLink-generated application image.
 * For debugging [disable stop on 0xc0000005 Illegal access](https://stackoverflow.com/questions/36250235/exception-0xc0000005-from-jni-createjavavm-jvm-dll).  The Java VM performs deliberate null pointer accesses on startup.
 * Make sure the environment variable `JAVA_HOME` is defined since it is used by the project to refer to includes and libraries.
-
-## Links used
-* https://docs.oracle.com/javase/8/docs/technotes/guides/jni/spec/intro.html
-* [Dynamic resource replacement on Windows](https://docs.microsoft.com/en-us/windows/win32/menurc/adding-deleting-and-replacing-resources)
-
-### Old new thing information
-A Microsoft Blog by Raymond Chen.  Extremely helpful information.
-* [The format of icon resources](https://devblogs.microsoft.com/oldnewthing/20120720-00/?p=7083)
-* [Part 1--Monochrome beginnings](https://devblogs.microsoft.com/oldnewthing/20101018-00/?p=12513)
-* [Part 2 - Now in color](https://devblogs.microsoft.com/oldnewthing/20101019-00/?p=12503)
-* [Part 3 - Apha blended](https://devblogs.microsoft.com/oldnewthing/20101021-00/?p=12483)
-* [Part 4 - Png images](https://devblogs.microsoft.com/oldnewthing/20101022-00/?p=12473)
