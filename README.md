@@ -22,6 +22,13 @@ The required parameters are:
 
 A complete sample call may look like 
 
-    `jlgen MakeLauncher C:\cygwin64\tmp\MMT.exe ..\mmt-icon-1024.png app.mmt de/michab/app/mmt/Mmt`.
+    `jlgen MakeLauncher C:\cygwin64\tmp\Farboo.exe ..\mmt-icon-1024.png app.mmt de/michab/app/mmt/Mmt`.
+    
+Note that the generated launcher--in our example 'Farboo.exe'--has to be placed in the existing jlink image directory hierarchy at the same position where the file `jvm.dll` is located.  This is currently `{jlink-app-root}/bin/server` but this may change coming versions of the Jdk.
 
-For the remaining commands see the Wiki.
+In Windows Explorer the launcher is displayed with the application icon that was passed to `jlgen.exe` above.  On a double click your application opens, joy starts :)
+
+The next step for professional application packing is to create a native Windows installer based on the JLink file system including the `jlgen`-generated launcher that has to be configured as the start application.  We use the WiX toolkit for this purpose, but this is a different story.
+
+See the project Wiki for more information on the remaining `jlgen` commands and if you want more info on `jlgen` development.
+
