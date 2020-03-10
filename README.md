@@ -10,7 +10,19 @@ Many other fine launchers exist.  But after a long search I did not find one tha
 
 ## How to use
 
-Get the jlgen executable from the project's [release page](https://github.com/michab66/jlaunch/releases).
+Get the latest version of the jlgen executable from the project's [release page](https://github.com/michab66/jlaunch/releases).
+
+`jlgen.exe` is a command line application that supports different commands.
+
+### Command `MakeLauncher`
+
+`MakeLauncher` represents the central functionalit of the software.  It generates a native Windows launcher for a JLink generated Java application image.  The required parameters are:
+* The name of the target file, e.g. 'Farboo.exe'.
+* The name of an icon file that is used to generate the required icon resources in the executable, e.g. 'farboo.png'.  Note that a .png file is required, no hassle with generating an .ico file.  It is recommended to offer a square high resolution image, though all sizes and resolutions will do.  This file gets scaled and resized for the resolutions 16, 32, 64, 128, 256 pixels.
+* The name of the target module. That is, the name of the module that holds the main Java application.
+* Finally, the name of the Java class representing the entry point to the application.  This class has to offer the Java-application's `public static void main( String[] argv )` operation.
+
+A complete sample call may look like `jlgen MakeLauncher C:\cygwin64\tmp\MMT.exe ..\mmt-icon-1024.png app.mmt de/michab/app/mmt/Mmt`.
 
 WriteLauncher targetFilename
 MakeLauncher targetFile, iconFile, moduleName, startClass
