@@ -10,10 +10,6 @@
 namespace smack {
 namespace util {
 
-void transform(const char* in, std::experimental::filesystem::path& out) {
-    out = std::experimental::filesystem::path(in);
-}
-
 void transform(const char* in, int& out) {
     std::size_t pos;
     out = std::stoi(in, &pos, 0);
