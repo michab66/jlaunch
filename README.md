@@ -16,10 +16,12 @@ Get the latest version of the jlgen executable from the project's [release page]
 
 The required parameters are:
 * The name of the target file, e.g. 'Farboo.exe'.
-* The name of an icon file that is used to generate the required icon resources in the executable, e.g. 'farboo.png'.  Note that a .png file is required, no hassle with generating an .ico file.  It is recommended to offer a square high resolution image, though all sizes and resolutions will do.  This file gets scaled and resized for the resolutions 16, 32, 64, 128, 256 pixels.
+* The name of an icon file that is used to generate the required icon resources in the executable, e.g. 'farboo.png'.  Note that a .png file is required, no hassle with generating an .ico file.  It is recommended to offer a square high resolution image, though all sizes and resolutions will do.  This image gets scaled and resized for the resolutions 16, 32, 64, 128, 256 pixels.
 * The name of the target module. That is, the name of the module that holds the main Java application. For example `app.mmt`.
 * Finally, the name of the Java class representing the entry point to the application.  This class has to offer the Java-application's `public static void main( String[] argv )` operation.  An example is `de/michab/app/mmt/Mmt`, note that you have to use `/` in this name instead of the `.`s used for example in `package` references.
 
-A complete sample call may look like `jlgen MakeLauncher C:\cygwin64\tmp\MMT.exe ..\mmt-icon-1024.png app.mmt de/michab/app/mmt/Mmt`.
+A complete sample call may look like 
+
+    `jlgen MakeLauncher C:\cygwin64\tmp\MMT.exe ..\mmt-icon-1024.png app.mmt de/michab/app/mmt/Mmt`.
 
 For the remaining commands see the Wiki.
