@@ -15,14 +15,14 @@ Get the latest version of the jlgen executable from the project's [release page]
 `jlgen.exe` is a command line application that supports different commands. The command *`MakeLauncher`* represents the central functionality of the software.  It generates a native Windows launcher for a JLink-generated Java application image.
 
 The required parameters are:
-* The name of the target file, e.g. 'Farboo.exe'.
+* The name of the target file, e.g. 'Farboo.exe'.  If the .exe extension is not specified then it is added.
 * The name of an icon file that is used to generate the required icon resources in the executable, e.g. 'farboo.png'.  Note that a *.png* file is required, no hassle with generating an .ico file.  It is recommended to offer a square, high resolution image, though all sizes and resolutions will do.  This image gets scaled and resized for the resolutions 16, 32, 64, 128, 256 pixels.
 * The name of the target module. That is, the name of the module that holds the main Java application. For example `app.mmt`.
-* Finally, the name of the Java class representing the entry point to the application.  This class has to offer the Java-application's `public static void main( String[] argv )` operation.  An example is `de/michab/app/mmt/Mmt`, note that you have to use `/` in this name instead of the `.`s used for example in `package` references.
+* Finally, the name of the Java class representing the entry point to the application.  This class has to offer the Java-application's `public static void main( String[] argv )` operation.  An example is `de.michab.app.mmt.Mmt`.
 
 A complete sample call may look like 
 
-    `jlgen MakeLauncher C:\cygwin64\tmp\Farboo.exe ..\mmt-icon-1024.png app.mmt de/michab/app/mmt/Mmt`.
+    `jlgen MakeLauncher C:\cygwin64\tmp\Farboo.exe ..\mmt-icon-1024.png app.mmt de.michab.app.mmt.Mmt`.
     
 ## I have the launcher executable, what now?
 Note that the generated launcher--in our example 'Farboo.exe'--has to be placed in the existing jlink image directory hierarchy at the same position where the file `jvm.dll` is located.  This is currently `{jlink-app-root}/bin/server` but this may change in coming versions of the Jdk. (It is a deliberate decision not to look-up the jvm.dll dynamically to prevent to start the target application using a wrong Jdk/Jre that non-deterministically happened to be found.)

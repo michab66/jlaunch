@@ -112,26 +112,45 @@ namespace jlgen
         return EXIT_SUCCESS;
     }
 
+    /**
+     * Default extension of the generated executable.
+     */
+    const auto exe_k = ".exe";
+
     /*
      * MakeLauncher C:\cygwin64\tmp\MMT.exe ..\mmt-icon-1024.png  mmt.app de/michab/app/mmt/Mmt
      */
     int MakeLauncher(
-        const path& targetFile,
+        path targetFile,
         const path& iconFile,
         const string& moduleName,
         const string& startClass
     )
     {
+        // Ensure we have an .exe extension.
+        if (targetFile.extension() != exe_k)
+            targetFile.replace_extension(exe_k);
+
         cerr << "Creating launcher: " << targetFile << endl;
         WriteLauncher(targetFile);
 
         ResourceMgr target{ targetFile };
 
         mob::windows::RtString strings;
-        cerr << "Adding main class name: " << startClass << endl;
+
+        // Covert dot-notation to invocation API conventions.
+        string actualStartClass{ startClass };
+        std::replace(
+            actualStartClass.begin(),
+            actualStartClass.end(),
+            '.',
+            '/');
+
+        cerr << "Adding main class name: " << actualStartClass << endl;
         strings.Add(
-            IDS_JAVA_MAIN_CLASS, 
-            startClass);
+            IDS_JAVA_MAIN_CLASS,
+            actualStartClass);
+
         cerr << "Adding main module name: " << moduleName << endl;
         strings.Add(
             IDS_JAVA_MAIN_MODULE, 
