@@ -29,7 +29,7 @@ A complete sample call may look like
 ## I have the launcher executable, what now?
 Note that the generated launcher--in our example 'Farboo.exe'--has to be placed in the existing jlink image directory hierarchy at the same position where the file `jvm.dll` is located.  This is currently `{jlink-app-root}/bin/server` but this may change in coming versions of the Jdk.
 
-In Windows Explorer the launcher is displayed with the application icon that was passed to `jlgen.exe` above.  On a double click your application opens, joy starts :)
+In Windows Explorer the launcher is displayed with the application icon that was passed to `jlgen.exe` above.  On a double click your application opens and joy starts :^)
 
 The next step for professional application packing is to create a native Windows installer based on the JLink file system including the `jlgen`-generated launcher that has to be configured as the start application.  We use the [WiX toolset](https://wixtoolset.org/) for this purpose, but this is a different story.
 
