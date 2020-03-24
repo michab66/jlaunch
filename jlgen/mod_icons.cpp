@@ -11,6 +11,7 @@
 #include <map>
 #include <vector>
 
+
  // See https://docs.microsoft.com/en-us/windows/uwp/design/globalizing/use-utf8-code-page
 #undef UNICODE
 
@@ -208,39 +209,6 @@ namespace util {
 namespace icons {
 
 /**
- * Use the passed image to create a set of scaled, square images in the
- * dimensions 16, 32, 64, 128, 256.  It is recommended to pass a square
- * image though all image sizes will do.
- */
-void WriteImageSet(
-    const path& sourceFile, 
-    const std::initializer_list<uint16_t> sizes)
-{
-    InitGdiPlus init;
-
-    if (!exists(sourceFile))
-        throw std::invalid_argument("File not found.");
-
-    std::wstring wideName = 
-        sourceFile.c_str();
-
-    Gdiplus::Bitmap bitmap{ wideName.c_str() };
-
-    CLSID fileClsid =
-        GetClsid(bitmap);
-    if (IsEqualCLSID(fileClsid, CLSID_NULL))
-        throw std::invalid_argument("Unknown file type.");
-
-    string baseName =
-        GetPath(sourceFile.generic_string());
-    string suffix = 
-        GetSuffix(sourceFile.generic_string());
-
-    for (auto c : sizes)
-        WriteImageFile(baseName, suffix, c, fileClsid, bitmap);
-}
-
-/**
  *
  */
 void CreateIcons(
@@ -280,6 +248,92 @@ void CreateIcons(
                 new RtIcon(dimension, dimension, 32, binary));
         outHolder.push_back(std::move(icon));
     }
+}
+
+/**
+ * See header.
+ */
+void CreateWindowsIcon(
+    const path& sourcePng,
+    const std::initializer_list<uint16_t> sizes,
+    const path& targetIco)
+{
+    std::vector<std::unique_ptr<RtIcon>> outHolder;
+    smack::util::icons::CreateIcons(
+        outHolder,
+        sizes,
+        sourcePng);
+
+    std::vector<std::uint8_t> fileContent;
+
+    // Add the prefix icondir structure.
+    ICONDIR icondir{
+        0,
+        1,
+        static_cast<WORD>(outHolder.size()) };
+    rawAppend(
+        fileContent,
+        &icondir,
+        sizeof(icondir) - sizeof(ICONDIRENTRY));
+
+    // Add the directory entry structures.
+    size_t currentOffset{
+        fileContent.size() + (outHolder.size() * sizeof(ICONDIRENTRY) )
+    };
+
+    for (const std::unique_ptr<RtIcon>& c : outHolder)
+    {
+        auto grpDirEntry =
+            c->GetDirectoryEntry();
+
+        ICONDIRENTRY dirEntry;
+        dirEntry.bWidth = 
+            grpDirEntry.bWidth;
+        dirEntry.bHeight = 
+            grpDirEntry.bHeight;
+        dirEntry.bColorCount =
+            grpDirEntry.bColorCount;
+        dirEntry.bReserved =
+            grpDirEntry.bReserved;
+        dirEntry.wPlanes =
+            grpDirEntry.wPlanes;
+        dirEntry.wBitCount =
+            grpDirEntry.wBitCount;
+        dirEntry.dwBytesInRes =
+            grpDirEntry.dwBytesInRes;
+
+        dirEntry.dwImageOffset =
+            static_cast<DWORD>(currentOffset);
+        currentOffset += c->raw_png().size();
+
+        rawAppend(
+            fileContent,
+            &dirEntry);
+    }
+
+    // Add the actual entries.
+    for (const std::unique_ptr<RtIcon>& c : outHolder)
+    {
+        auto pngData =
+            c->raw_png();
+        rawAppend(
+            fileContent,
+            pngData.data(),
+            pngData.size()
+        );
+    }
+
+    // Write to file.
+    std::ofstream fout(
+        targetIco,
+        std::ios::binary);
+    void* data =
+        fileContent.data();
+    fout.write(
+        static_cast<const char*>(data),
+        fileContent.size());
+    // Trigger write error here, not in destructor.
+    fout.close();
 }
 
 }

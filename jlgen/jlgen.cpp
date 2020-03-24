@@ -169,12 +169,19 @@ namespace jlgen
         return EXIT_SUCCESS;
     }
 
-    int WriteImageSet(
-        const string& file)
+    int CreateWindowsIcon(
+        const string& pngFile)
     {
-        smack::util::icons::WriteImageSet(
-            file,
-            IMAGE_SIZES );
+        path icnFile = pngFile;
+        icnFile.replace_extension(".ico");
+
+        cerr << "Writing icon file: " << icnFile << endl;
+
+        smack::util::icons::CreateWindowsIcon(
+            pngFile,
+            IMAGE_SIZES,
+            icnFile);
+
         return EXIT_SUCCESS;
     }
 
@@ -199,10 +206,10 @@ namespace jlgen
                     "startClass"
                 }),
             Commands<string>::make(
-                "WriteImageSet",
-                WriteImageSet,
+                "CreateWindowsIcon",
+                CreateWindowsIcon,
                 { 
-                    "imageFilename" 
+                    "pngFilename",
                 })
         );
 

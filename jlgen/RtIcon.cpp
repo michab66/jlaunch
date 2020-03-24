@@ -43,4 +43,4 @@ void RtIcon::update(HANDLE resourceHolder, int resourceId)
 }
 
 } // namespace windows
-} // namespace micbinz
+} // namespace mob
