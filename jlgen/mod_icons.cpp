@@ -11,6 +11,8 @@
 #include <map>
 #include <vector>
 
+#include <intrin.h>
+
  // See https://docs.microsoft.com/en-us/windows/uwp/design/globalizing/use-utf8-code-page
 #undef UNICODE
 
@@ -208,39 +210,6 @@ namespace util {
 namespace icons {
 
 /**
- * Use the passed image to create a set of scaled, square images in the
- * dimensions 16, 32, 64, 128, 256.  It is recommended to pass a square
- * image though all image sizes will do.
- */
-void WriteImageSet(
-    const path& sourceFile, 
-    const std::initializer_list<uint16_t> sizes)
-{
-    InitGdiPlus init;
-
-    if (!exists(sourceFile))
-        throw std::invalid_argument("File not found.");
-
-    std::wstring wideName = 
-        sourceFile.c_str();
-
-    Gdiplus::Bitmap bitmap{ wideName.c_str() };
-
-    CLSID fileClsid =
-        GetClsid(bitmap);
-    if (IsEqualCLSID(fileClsid, CLSID_NULL))
-        throw std::invalid_argument("Unknown file type.");
-
-    string baseName =
-        GetPath(sourceFile.generic_string());
-    string suffix = 
-        GetSuffix(sourceFile.generic_string());
-
-    for (auto c : sizes)
-        WriteImageFile(baseName, suffix, c, fileClsid, bitmap);
-}
-
-/**
  *
  */
 void CreateIcons(
@@ -280,6 +249,208 @@ void CreateIcons(
                 new RtIcon(dimension, dimension, 32, binary));
         outHolder.push_back(std::move(icon));
     }
+}
+
+/**
+ * See header.
+ */
+void CreateWindowsIcon(
+    const path& sourcePng,
+    const std::initializer_list<uint16_t> sizes,
+    const path& targetIco)
+{
+    std::vector<std::unique_ptr<RtIcon>> outHolder;
+    smack::util::icons::CreateIcons(
+        outHolder,
+        sizes,
+        sourcePng);
+
+    std::vector<std::uint8_t> fileContent;
+
+    // Add the prefix icondir structure.
+    ICONDIR icondir{
+        0,
+        1,
+        static_cast<WORD>(outHolder.size()) };
+    rawAppend(
+        fileContent,
+        &icondir,
+        sizeof(icondir) - sizeof(ICONDIRENTRY));
+
+    // Add the directory entry structures.
+    size_t currentOffset{
+        fileContent.size() + (outHolder.size() * sizeof(ICONDIRENTRY) )
+    };
+
+    for (const std::unique_ptr<RtIcon>& c : outHolder)
+    {
+        auto grpDirEntry =
+            c->GetDirectoryEntry();
+
+        ICONDIRENTRY dirEntry;
+        dirEntry.bWidth = 
+            grpDirEntry.bWidth;
+        dirEntry.bHeight = 
+            grpDirEntry.bHeight;
+        dirEntry.bColorCount =
+            grpDirEntry.bColorCount;
+        dirEntry.bReserved =
+            grpDirEntry.bReserved;
+        dirEntry.wPlanes =
+            grpDirEntry.wPlanes;
+        dirEntry.wBitCount =
+            grpDirEntry.wBitCount;
+        dirEntry.dwBytesInRes =
+            grpDirEntry.dwBytesInRes;
+
+        dirEntry.dwImageOffset =
+            static_cast<DWORD>(currentOffset);
+        currentOffset += c->raw_png().size();
+
+        rawAppend(
+            fileContent,
+            &dirEntry);
+    }
+
+    // Add the actual entries.
+    for (const std::unique_ptr<RtIcon>& c : outHolder)
+    {
+        auto pngData =
+            c->raw_png();
+        rawAppend(
+            fileContent,
+            pngData.data(),
+            pngData.size()
+        );
+    }
+
+    // Write to file.
+    std::ofstream fout(
+        targetIco,
+        std::ios::binary);
+    void* data =
+        fileContent.data();
+    fout.write(
+        static_cast<const char*>(data),
+        fileContent.size());
+    // Trigger write error here, not in destructor.
+    fout.close();
+}
+
+/**
+ * See header.
+ *
+ * The implementation uses info from
+ * https://en.wikipedia.org/wiki/Apple_Icon_Image_format
+ */
+void CreateAppleIcon(
+    const path& sourcePng,
+    const std::initializer_list<uint16_t> sizes,
+    const path& targetIco)
+{
+    std::vector<std::unique_ptr<RtIcon>> outHolder;
+    smack::util::icons::CreateIcons(
+        outHolder,
+        sizes,
+        sourcePng);
+
+    std::vector<std::uint8_t> fileContent;
+
+    // Write the lead-in magic literal.
+    rawAppend(
+        fileContent,
+        "icns",
+        4 );
+
+    // Compute the size of the file we generate.
+    {
+        uint32_t fileSize = static_cast<uint32_t>(
+            // Sizeof magic literal.
+            fileContent.size() +
+            sizeof(fileSize) +
+            // 8 = sizeof( IconType ) + sizeof( LengthOfData ).
+            (outHolder.size() * 8) );
+        for (const std::unique_ptr<RtIcon>& c : outHolder)
+            fileSize += static_cast<uint32_t>(c->raw_png().size());
+        fileContent.reserve(fileSize);
+
+        // MSVC intrinsic.
+        fileSize = _byteswap_ulong(fileSize);
+
+        rawAppend(
+            fileContent,
+            &fileSize
+        );
+    }
+
+    for (const std::unique_ptr<RtIcon>& c : outHolder)
+    {
+        auto grpDirEntry =
+            c->GetDirectoryEntry();
+
+        const char* OSType;
+        switch (grpDirEntry.bWidth)
+        {
+        case 16:
+            OSType = "icp4";
+            break;
+        case 32:
+            OSType = "icp5";
+            break;
+        case 64:
+            OSType = "icp6";
+            break;
+        case 128:
+            OSType = "ic07";
+            break;
+        // Zero means actually 256.
+        case 0:
+            OSType = "ic08";
+            break;
+        default:
+            throw std::invalid_argument("Unexpected size.");
+        }
+
+        // Icon type.
+        rawAppend(
+            fileContent,
+            OSType,
+            4 );
+
+        auto data = 
+            c->raw_png();
+        uint32_t size =
+            static_cast<uint32_t>(data.size());
+        // Size is 'including type and length'.
+        size += 
+            (sizeof(size) + 4);
+        size =
+            _byteswap_ulong(size);
+
+        // Length of data, big endian.
+        rawAppend(
+            fileContent,
+            &size
+        );
+        // Icon data.
+        rawAppend(
+            fileContent,
+            data.data(),
+            data.size()
+        );
+    }
+
+    // Write to file.
+    std::ofstream fout(
+        targetIco,
+        std::ios::binary);
+    void* data =
+        fileContent.data();
+    fout.write(
+        static_cast<const char*>(data),
+        fileContent.size());
+    // Trigger write error here, not in destructor.
+    fout.close();
 }
 
 }
