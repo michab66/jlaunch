@@ -11,6 +11,7 @@
 #include <map>
 #include <vector>
 
+#include <intrin.h>
 
  // See https://docs.microsoft.com/en-us/windows/uwp/design/globalizing/use-utf8-code-page
 #undef UNICODE
@@ -320,6 +321,122 @@ void CreateWindowsIcon(
             fileContent,
             pngData.data(),
             pngData.size()
+        );
+    }
+
+    // Write to file.
+    std::ofstream fout(
+        targetIco,
+        std::ios::binary);
+    void* data =
+        fileContent.data();
+    fout.write(
+        static_cast<const char*>(data),
+        fileContent.size());
+    // Trigger write error here, not in destructor.
+    fout.close();
+}
+
+/**
+ * See header.
+ *
+ * The implementation uses info from
+ * https://en.wikipedia.org/wiki/Apple_Icon_Image_format
+ */
+void CreateAppleIcon(
+    const path& sourcePng,
+    const std::initializer_list<uint16_t> sizes,
+    const path& targetIco)
+{
+    std::vector<std::unique_ptr<RtIcon>> outHolder;
+    smack::util::icons::CreateIcons(
+        outHolder,
+        sizes,
+        sourcePng);
+
+    std::vector<std::uint8_t> fileContent;
+
+    // Write the lead-in magic literal.
+    rawAppend(
+        fileContent,
+        "icns",
+        4 );
+
+    // Compute the size of the file we generate.
+    {
+        uint32_t fileSize = static_cast<uint32_t>(
+            // Sizeof magic literal.
+            fileContent.size() +
+            sizeof(fileSize) +
+            // 8 = sizeof( IconType ) + sizeof( LengthOfData ).
+            (outHolder.size() * 8) );
+        for (const std::unique_ptr<RtIcon>& c : outHolder)
+            fileSize += static_cast<uint32_t>(c->raw_png().size());
+        fileContent.reserve(fileSize);
+
+        // MSVC intrinsic.
+        fileSize = _byteswap_ulong(fileSize);
+
+        rawAppend(
+            fileContent,
+            &fileSize
+        );
+    }
+
+    for (const std::unique_ptr<RtIcon>& c : outHolder)
+    {
+        auto grpDirEntry =
+            c->GetDirectoryEntry();
+
+        const char* OSType;
+        switch (grpDirEntry.bWidth)
+        {
+        case 16:
+            OSType = "icp4";
+            break;
+        case 32:
+            OSType = "icp5";
+            break;
+        case 64:
+            OSType = "icp6";
+            break;
+        case 128:
+            OSType = "ic07";
+            break;
+        // Zero means actually 256.
+        case 0:
+            OSType = "ic08";
+            break;
+        default:
+            throw std::invalid_argument("Unexpected size.");
+        }
+
+        // Icon type.
+        rawAppend(
+            fileContent,
+            OSType,
+            4 );
+
+        auto data = 
+            c->raw_png();
+        uint32_t size =
+            static_cast<uint32_t>(data.size());
+        // Size is 'including type and length'.
+        size += 
+            (sizeof(size) + 4);
+        size =
+            _byteswap_ulong(size);
+
+        // Length of data, big endian.
+        rawAppend(
+            fileContent,
+            &size
+        );
+        // Icon data.
+        rawAppend(
+            fileContent,
+            data.data(),
+            data.size()
         );
     }
 
