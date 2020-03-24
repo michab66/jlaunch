@@ -32,6 +32,11 @@ namespace windows
 
         void update(HANDLE resourceHolder, int resourceId);
 
+        const std::vector<std::uint8_t>& raw_png()
+        {
+            return data_;
+        }
+
         GRPICONDIRENTRY GetDirectoryEntry()
         {
             return directoryEntry_;
@@ -39,4 +44,4 @@ namespace windows
     };
 
 } // namespace windows
-} // namespace micbinz
+} // namespace mob
