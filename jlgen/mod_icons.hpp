@@ -22,7 +22,7 @@ using std::string;
 using std::experimental::filesystem::path;
 
 /**
- * Create a Windows .icn file from an input .png file.
+ * Create a Windows .ico file from an input .png file.
  * Use the passed sizes to create a set of scaled, square images in the
  * supported dimensions.  It is recommended to pass a square image though
  * all image sizes will do.
@@ -32,6 +32,21 @@ using std::experimental::filesystem::path;
  * @param targetIco The target file.  If this exists it gets overwritten.
  */
 void CreateWindowsIcon(
+    const path& sourcePng,
+    const std::initializer_list<uint16_t> sizes,
+    const path& targetIco);
+
+/**
+ * Create an MacOS .icns file from an input .png file.
+ * Use the passed sizes to create a set of scaled, square images in the
+ * supported dimensions.  It is recommended to pass a square image though
+ * all image sizes will do.
+ *
+ * @param sourcePng The source .png file.  This must exist.
+ * @param sizes A list of sizes.  Used to create square images.
+ * @param targetIco The target file.  If this exists it gets overwritten.
+ */
+void CreateAppleIcon(
     const path& sourcePng,
     const std::initializer_list<uint16_t> sizes,
     const path& targetIco);

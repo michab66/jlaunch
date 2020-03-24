@@ -169,6 +169,12 @@ namespace jlgen
         return EXIT_SUCCESS;
     }
 
+    /**
+     * Create an .ico icon file for Windows.  Create target file at position
+     * of input file with extension .ico.
+     *
+     * @param pngFile Input png.
+     */
     int CreateWindowsIcon(
         const string& pngFile)
     {
@@ -178,6 +184,30 @@ namespace jlgen
         cerr << "Writing icon file: " << icnFile << endl;
 
         smack::util::icons::CreateWindowsIcon(
+            pngFile,
+            IMAGE_SIZES,
+            icnFile);
+
+        return EXIT_SUCCESS;
+    }
+
+    /**
+     * Create an .icns icon for Mac.  Create target file at position
+     * of input file with extension .icns.
+     *
+     * @param pngFile Input png.
+     */
+    int CreateAppleIcon(
+        const string& pngFile)
+    {
+        path icnFile = pngFile;
+        icnFile.replace_extension(".icns");
+
+        cerr << "Writing icon file: " << icnFile << endl;
+
+        // TODO(michab66) The Apple iconviewer expects 16,32,128,256,512.
+        // But the file with our current setting seems to work.
+        smack::util::icons::CreateAppleIcon(
             pngFile,
             IMAGE_SIZES,
             icnFile);
@@ -208,6 +238,12 @@ namespace jlgen
             Commands<string>::make(
                 "CreateWindowsIcon",
                 CreateWindowsIcon,
+                { 
+                    "pngFilename",
+                }),
+            Commands<string>::make(
+                "CreateAppleIcon",
+                CreateAppleIcon,
                 { 
                     "pngFilename",
                 })
