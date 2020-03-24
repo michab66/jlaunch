@@ -17,18 +17,6 @@ Firstly, get the latest version of the jlgen executable from the project's [rele
 
 `jlgen.exe` is a command line application that supports different commands.  Execute `jlgen` to get a list of the supported commands.
 
-## How to generate a Windows `.ico`-file -- `CreateWindowsIcon`
-
-The command *`CreateWindowsIcon`* lets you create a Windows `.ico`-file from a given input `.png`-file. Internally the input `.png` gets scaled to square images of the pixel sizes 16x16, 32x32, 64x64, 128x128 and 256x256.  The resulting `.ico`-file is generated in the directory of the input file, with an `.ico` suffix.  The command line is:
-
-    `jlgen CreateWindowsIcon <input.png>`.
-
-A sample command line is
-
-    `jlgen CreateWindowsIcon felix.png`.
-
-This results in the creation of the file `felix.ico` in the same directory as `felix.png`.
-
 ## How to generate a launcher -- `MakeLauncher`
 
 The command *`MakeLauncher`* represents the central functionality of the software.  It generates a native Windows launcher for a JLink-generated Java application image.  The command line is
@@ -44,6 +32,30 @@ The required parameters are:
 A complete sample call may look like 
 
     `jlgen MakeLauncher C:\cygwin64\tmp\Farboo.exe ..\mmt-icon-1024.png app.mmt de.michab.app.mmt.Mmt`.
+
+## How to generate a Windows `.ico`-file -- `CreateWindowsIcon`
+
+The command *`CreateWindowsIcon`* lets you create a Windows `.ico`-file from a given input `.png`-file. Internally the input `.png` gets scaled to square images of the pixel sizes 16x16, 32x32, 64x64, 128x128 and 256x256.  The resulting `.ico`-file is generated in the directory of the input file, with an `.ico` suffix.  The command line is:
+
+    `jlgen CreateWindowsIcon <input.png>`.
+
+A sample command line is
+
+    `jlgen CreateWindowsIcon felix.png`.
+
+This results in the creation of the file `felix.ico` in the same directory as `felix.png`.
+
+## How to generate a MacOS `.icns`-file -- `CreateAppleIcon`
+
+The command *`CreateAppleIcon`* lets you create a MacOS `.icns`-file from a given input `.png`-file. Internally the input `.png` gets scaled to square images of the pixel sizes 16x16, 32x32, 64x64, 128x128 and 256x256.  The resulting `.icns`-file is generated in the directory of the input file, with an `.icns` suffix.  The command line is:
+
+    `jlgen CreateAppleIcon <input.png>`.
+
+A sample command line is
+
+    `jlgen CreateAppleIcon felix.png`.
+
+This results in the creation of the file `felix.icns` in the same directory as `felix.png`.
 
 # I have the launcher executable and the icon files, what now?
 Note that the generated launcher--in our example 'Farboo.exe'--has to be placed in the existing jlink image directory hierarchy at the same position where the file `jvm.dll` is located.  This is currently `{jlink-app-root}/bin/server` but this may change in coming versions of the Jdk.
