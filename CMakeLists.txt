@@ -8,7 +8,7 @@ cmake_minimum_required(VERSION 3.11.0 FATAL_ERROR)
 set( CMAKE_BUILD_TYPE "Release" CACHE STRING "Default.")
 set( CMAKE_INSTALL_PREFIX "./dist" CACHE STRING "Default.")
 
-project(smack_cpp VERSION 0.1.0 LANGUAGES CXX)
+project(jlaunch VERSION 0.1.0 LANGUAGES CXX)
 
 include(FetchContent)
 #FetchContent_Declare(
