@@ -14,10 +14,9 @@
 #include <memory>
 #include <string>
 #include <vector>
-#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-#include <experimental/filesystem>
+#include <filesystem>
 
-#include "util_console_app.hpp"
+#include <smack_cli.hpp>
 
 #include "winicon.h"
 #include "ResourceMgr.h"
@@ -30,10 +29,14 @@
 using std::string;
 using std::cerr;
 using std::endl;
-using std::experimental::filesystem::path;
+using std::filesystem::path;
 using mob::windows::ResourceMgr;
 using mob::windows::RtIconGroup;
 using mob::windows::RtIcon;
+
+template<> void smack::cli::transform(const char* in, std::filesystem::path& out) {
+    out = in;
+}
 
 namespace jlgen
 {
@@ -216,34 +219,30 @@ namespace jlgen
     }
 
     int execute(const std::vector<string>& argv) {
-        using smack::util::Commands;
+        using smack::cli::Commands;
 
-        auto cli = smack::util::makeCliApplication(
+        auto cli = smack::cli::makeCliApplication(
 
-            Commands<path>::make(
+            Commands::make<WriteLauncher>(
                 "WriteLauncher",
-                WriteLauncher,
                 {
                     "targetFilename"
                 }),
-            Commands<path, path, string, string>::make(
+            Commands::make<MakeLauncher>(
                 "MakeLauncher",
-                MakeLauncher,
                 {
                     "targetFile",
                     "iconFile",
                     "moduleName",
                     "startClass"
                 }),
-            Commands<string>::make(
+            Commands::make<CreateWindowsIcon>(
                 "CreateWindowsIcon",
-                CreateWindowsIcon,
                 { 
                     "pngFilename",
                 }),
-            Commands<string>::make(
+            Commands::make<CreateAppleIcon>(
                 "CreateAppleIcon",
-                CreateAppleIcon,
                 { 
                     "pngFilename",
                 })

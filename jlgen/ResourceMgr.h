@@ -5,8 +5,7 @@
 
 #pragma once
 
-#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-#include <experimental/filesystem>
+#include <filesystem>
 #include <string>
 
 #define WIN32_LEAN_AND_MEAN
@@ -19,7 +18,7 @@
 namespace mob {
 namespace windows {
 
-using std::experimental::filesystem::path;
+using std::filesystem::path;
 using std::string;
 using mob::windows::RtIconGroup;
 using mob::windows::RtString;

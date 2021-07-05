@@ -25,7 +25,12 @@ add_executable(jlgen
     ${headers}
 )
 
-target_include_directories(jlgen INTERFACE .)
+target_link_libraries(jlgen
+    smack_cpp
+)
+
+#target_include_directories(jlgen INTERFACE .)
+
 
 #install(TARGETS
 #  smack_cpp
@@ -33,4 +38,3 @@ target_include_directories(jlgen INTERFACE .)
 #install(FILES
 #  ${headers}
 #  DESTINATION include/smack_cpp)
-
