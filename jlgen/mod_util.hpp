@@ -8,6 +8,9 @@
 
 #pragma once
 
+#define _SILENCE_CXX17_CODECVT_HEADER_DEPRECATION_WARNING 1
+#pragma warning(disable : 4996)
+
 #include <codecvt>
 #include <string>
 
