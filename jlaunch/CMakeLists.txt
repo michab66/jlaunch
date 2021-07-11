@@ -1,4 +1,4 @@
-﻿cmake_minimum_required(VERSION 3.5.0 FATAL_ERROR)
+﻿cmake_minimum_required(VERSION 3.13.0 FATAL_ERROR)
 
 set(headers
     jlaunch_resource_ids.h
@@ -7,19 +7,22 @@ set(implementation
     jlaunch.cpp
 )
 
-add_executable(jlaunch
+add_executable(jlaunch WIN32
     ${implementation}
     ${headers}
 )
 
-#target_link_libraries(jlaunch
-#    smack_cpp
-#)
-
-message( MichaelBinz )
+target_link_libraries(jlaunch
+    smack_cpp
+    jvm.lib
+)
 
 file(TO_CMAKE_PATH $ENV{JAVA_HOME} NORMALIZED_JAVA_HOME)
-message( "${NORMALIZED_JAVA_HOME}/include" )
+
+target_link_directories(jlaunch
+    PRIVATE
+    "${NORMALIZED_JAVA_HOME}/lib"
+)
 
 target_include_directories(jlaunch
     PRIVATE
