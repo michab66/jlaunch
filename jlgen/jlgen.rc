@@ -50,7 +50,7 @@ END
 // Binary
 //
 
-IDR_BINARY1             RCDATA                  "..\\x64\\Release\\jlaunch.exe"
+IDR_BINARY1             RCDATA                  "..\\jlaunch.exe"
 
 #endif    // Deutsch (Deutschland) resources
 /////////////////////////////////////////////////////////////////////////////

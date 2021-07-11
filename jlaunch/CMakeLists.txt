@@ -29,3 +29,11 @@ target_include_directories(jlaunch
 	"${NORMALIZED_JAVA_HOME}/include"
 	"${NORMALIZED_JAVA_HOME}/include/win32"
 )
+
+add_custom_command(
+    TARGET jlaunch 
+    POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy  
+                     "$<TARGET_FILE:jlaunch>"
+                     "${PROJECT_BINARY_DIR}"
+)
