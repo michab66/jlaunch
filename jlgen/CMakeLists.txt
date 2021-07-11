@@ -19,10 +19,14 @@ set(implementation
     mod_icons.cpp
     jlgen.cpp
 )
-
+set(resources
+    jlgen.rc
+)
+	
 add_executable(jlgen
     ${implementation}
     ${headers}
+    ${resources}
 )
 
 target_link_libraries(jlgen
