@@ -5,7 +5,7 @@ cmake_minimum_required(VERSION 3.11.0 FATAL_ERROR)
 
 # Set the variables before the project definition to get their
 # default values int the cmake cache.
-set( CMAKE_BUILD_TYPE "Release" CACHE STRING "Default.")
+#set( CMAKE_BUILD_TYPE "Release" CACHE STRING "Default.")
 set( CMAKE_INSTALL_PREFIX "./dist" CACHE STRING "Default.")
 
 project(jlaunch VERSION 0.1.0 LANGUAGES CXX)
@@ -39,6 +39,4 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 set(MSVC_RUNTIME_LIBRARY "MultiThreadedDLL")
 
 add_subdirectory(jlgen)
-#add_subdirectory(examples)
-#add_subdirectory(test)
-
+add_subdirectory(jlaunch)
