@@ -42,16 +42,3 @@ add_subdirectory(jlgen)
 add_subdirectory(jlaunch)
 
 add_dependencies(jlgen jlaunch)
-
-#set( tf "$<TARGET_FILE:jlaunch>" )
-#message( micbinz )
-
-#add_custom_target(genexdebug COMMAND ${CMAKE_COMMAND} -E echo #"$<TARGET_FILE:jlaunch>")
-
-#set(rc_flags "/d 0x809")
-#set(CMAKE_RC_FLAGS ${rc_flags})
-
-#file(GENERATE OUTPUT micbinz.rc
-#     CONTENT "xxx $<TARGET_FILE:jlaunch>"
-#     CONTENT "xxx"
-#)
