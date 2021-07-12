@@ -20,8 +20,12 @@
 #define WIN32_LEAN_AND_MEAN
 #include <windows.h>
 
+// Prevent warnings in the external header.
+#pragma warning( push )
+#pragma warning( disable : 26812 )
  // Define JAVA_HOME in project include paths if this is not found.
 #include <jni.h>
+#pragma warning( pop )
 
  // Get our resource definitions.
 #include "jlaunch_resource_ids.h"

@@ -34,8 +34,7 @@
 #pragma comment(lib, "gdiplus.lib")
 #pragma comment(lib, "Shlwapi.lib")
 
-using std::experimental::filesystem::exists;
-using std::experimental::filesystem::path;
+using std::filesystem::path;
 using std::string;
 using std::vector;
 using Gdiplus::Graphics;

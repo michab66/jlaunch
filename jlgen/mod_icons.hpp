@@ -7,8 +7,7 @@
 
 #pragma once
 
-#define _SILENCE_EXPERIMENTAL_FILESYSTEM_DEPRECATION_WARNING
-#include <experimental/filesystem>
+#include <filesystem>
 #include <initializer_list>
 #include <string>
 
@@ -19,7 +18,7 @@ namespace util {
 namespace icons {
 
 using std::string;
-using std::experimental::filesystem::path;
+using std::filesystem::path;
 
 /**
  * Create a Windows .ico file from an input .png file.
