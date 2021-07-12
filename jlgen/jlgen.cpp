@@ -227,7 +227,7 @@ namespace
 int main(int argc, char** argv) {
     using smack::cli::Commands;
 
-    auto cli = smack::cli::makeCliApplication(
+    smack::cli::CliApplication cli(
         Commands::make<WriteLauncher>(
             "WriteLauncher",
             {
