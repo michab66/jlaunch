@@ -20,7 +20,7 @@ include(FetchContent)
 FetchContent_Declare(
   smack_cpp
   GIT_REPOSITORY https://github.com/smacklib/dev_smack_cpp.git
-  GIT_TAG        v17.4
+  GIT_TAG        v17.6
 )
 
 # After the following call, the CMake targets defined by googletest
