@@ -228,13 +228,16 @@ int main(int argc, char** argv) {
     using smack::cli::Commands;
 
     smack::cli::CliApplication cli(
+        "The swiss army knife for Windows Java-launcher generation.",
         Commands::make<WriteLauncher>(
             "WriteLauncher",
+            "Write a launcher for test purposes.",
             {
                 "targetFilename"
             }),
         Commands::make<MakeLauncher>(
             "MakeLauncher",
+            "Create a launcher using the passed parameters.",
             {
                 "targetFile",
                 "iconFile",
@@ -243,11 +246,13 @@ int main(int argc, char** argv) {
             }),
         Commands::make<CreateWindowsIcon>(
             "CreateWindowsIcon",
+            "Create a Windows .icn file from the passed .png.",
             {
                 "pngFilename",
             }),
         Commands::make<CreateAppleIcon>(
             "CreateAppleIcon",
+            "Create a MacOs .icns file from the passed .png.",
             {
                 "pngFilename",
             })
