@@ -35,11 +35,11 @@ using mob::windows::RtIconGroup;
 using mob::windows::RtIcon;
 
 // Integrate custom type std::filesystem::path for smack::cli.
-template<> void smack::cli::transform(const char* in, std::filesystem::path& out) {
+template<> void smack::convert::transform(const char* in, std::filesystem::path& out) {
     out = in;
 }
 template<>
-const char* smack::cli::get_typename(std::filesystem::path type) {
+const char* smack::convert::get_typename(std::filesystem::path type) {
     return "path";
 }
 
